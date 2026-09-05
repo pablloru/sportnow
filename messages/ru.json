@@ -1,0 +1,179 @@
+{
+  "meta": {
+    "siteName": "Sport.Zone",
+    "defaultTitle": "Sport.Zone — спортивная аналитика и прогнозы",
+    "defaultDescription": "Современная платформа спортивной аналитики: ближайшие события, новости, прогнозы и AI-анализ по футболу, хоккею, теннису и киберспорту."
+  },
+  "nav": {
+    "home": "Главная",
+    "sports": "Виды спорта",
+    "results": "Результаты",
+    "news": "Новости",
+    "predictions": "Прогнозы",
+    "search": "Поиск"
+  },
+  "common": {
+    "readMore": "Читать далее",
+    "viewAll": "Смотреть все",
+    "viewAllEvents": "Все события",
+    "viewAllNews": "Все новости",
+    "backToSport": "Назад к разделу",
+    "vs": "vs",
+    "today": "Сегодня",
+    "source": "Источник",
+    "emptyState": "Пока нет данных для этого раздела.",
+    "countdown": {
+      "label": "До начала",
+      "days": "д",
+      "hours": "ч",
+      "minutes": "м",
+      "seconds": "с",
+      "startingSoon": "Начинается"
+    }
+  },
+  "status": {
+    "scheduled": "Запланирован",
+    "finished": "Завершён",
+    "postponed": "Отложен",
+    "cancelled": "Отменён"
+  },
+  "sports": {
+    "football": { "name": "Футбол", "shortName": "Футбол" },
+    "hockey": { "name": "Хоккей", "shortName": "Хоккей" },
+    "tennis": { "name": "Теннис", "shortName": "Теннис" },
+    "cs2": { "name": "Counter-Strike 2", "shortName": "CS2" },
+    "dota-2": { "name": "Dota 2", "shortName": "Dota 2" },
+    "mobile-legends": { "name": "Mobile Legends: Bang Bang", "shortName": "Mobile Legends" },
+    "ufc": { "name": "UFC", "shortName": "UFC" }
+  },
+  "home": {
+    "heroTitle": "Спорт прямо сейчас — понятно и по делу",
+    "heroSubtitle": "Ближайшие события, аналитика и прогнозы по семи видам спорта в одном месте.",
+    "sectionCategories": "Виды спорта",
+    "sectionNews": "Главные новости",
+    "sectionUpcoming": "Ближайшие события",
+    "sectionPopular": "Популярные события",
+    "sectionPredictions": "Прогнозы",
+    "sectionToday": "Что важно знать сегодня"
+  },
+  "sportPage": {
+    "upcoming": "Ближайшие события",
+    "results": "Результаты",
+    "seeAllResults": "Все результаты",
+    "popular": "Популярные события",
+    "news": "Новости",
+    "articles": "Аналитика",
+    "predictions": "Прогнозы",
+    "teams": "Команды",
+    "metaDescription": "{name}: ближайшие события, результаты, новости и прогнозы."
+  },
+  "comparison": {
+    "title": "Сравнение команд",
+    "recentForm": "Форма (последние 5)",
+    "headToHead": "Личные встречи",
+    "meetingsCount": "{count} матчей в базе",
+    "noMeetings": "Эти команды ещё не встречались — данных о личных встречах пока нет.",
+    "wins": "Победы",
+    "draws": "Ничьи",
+    "losses": "Поражения",
+    "winsShort": "В",
+    "drawsShort": "Н",
+    "lossesShort": "П",
+    "keyStats": "Ключевые показатели"
+  },
+  "teamPage": {
+    "roster": "Состав",
+    "recentMatches": "Последние матчи",
+    "keyPlayer": "Ключевой игрок",
+    "backToTeam": "К странице команды",
+    "seeAllResults": "Все результаты команды",
+    "metaDescription": "{name}: форма, ближайшие и прошедшие матчи, состав, новости — {sport}."
+  },
+  "search": {
+    "title": "Поиск",
+    "placeholder": "Команды, турниры, статьи, новости…",
+    "hint": "Начните вводить, чтобы найти события, команды, статьи и новости по всем видам спорта.",
+    "noResults": "Ничего не найдено по запросу «{query}». Попробуйте другое название команды или турнира.",
+    "resultsCount": "{count} найдено",
+    "sports": "Виды спорта",
+    "teams": "Команды",
+    "events": "События",
+    "articles": "Аналитика",
+    "news": "Новости"
+  },
+  "resultsPage": {
+    "title": "Результаты",
+    "subtitle": "История завершённых событий по всем видам спорта — с фильтрами и поиском.",
+    "searchPlaceholder": "Команда или турнир…",
+    "allSports": "Все виды спорта",
+    "allCompetitions": "Все турниры",
+    "period": "Период",
+    "periodAll": "За всё время",
+    "period7d": "Последние 7 дней",
+    "period30d": "Последние 30 дней",
+    "period90d": "Последние 3 месяца",
+    "sortNewest": "Сначала новые",
+    "sortOldest": "Сначала старые",
+    "resultsCount": "{count} событий",
+    "noResults": "По выбранным фильтрам ничего не найдено. Попробуйте изменить условия.",
+    "showMore": "Показать ещё",
+    "resetFilters": "Сбросить фильтры"
+  },
+  "eventPage": {
+    "tournament": "Турнир",
+    "venue": "Место проведения",
+    "form": "Форма",
+    "lastResults": "Последние результаты",
+    "statistics": "Статистика",
+    "lineups": "Составы",
+    "starters": "Основной состав",
+    "bench": "Запасные",
+    "news": "Новости по матчу",
+    "keyFactors": "Ключевые факторы",
+    "prediction": "AI Match Analysis",
+    "predictionDisclaimer": "Демонстрационная модель на основе mock-данных. Не является гарантией результата и не должна использоваться как единственное основание для решений.",
+    "whatChanged": "Что изменилось?",
+    "whyItMatters": "Почему это важно?",
+    "related": "Статьи по теме",
+    "homeWin": "Победа хозяев",
+    "draw": "Ничья",
+    "awayWin": "Победа гостей",
+    "markets": {
+      "title": "Другие вероятные исходы",
+      "totalTitle": "Тотал {line}",
+      "over": "Больше {line}",
+      "under": "Меньше {line}",
+      "bttsTitle": "Обе забьют",
+      "yes": "Да",
+      "no": "Нет",
+      "handicapTitle": "Гандикап",
+      "methodTitle": "Способ победы",
+      "methodFinish": "Победа досрочно",
+      "methodDecision": "По решению судей"
+    }
+  },
+  "articlePage": {
+    "publishedOn": "Опубликовано",
+    "updatedOn": "Обновлено",
+    "relatedEvents": "Связанные события",
+    "relatedArticles": "Похожие материалы",
+    "demoLabel": "Демонстрационный материал"
+  },
+  "newsPage": {
+    "relatedTeams": "Упоминаются в новости"
+  },
+  "importance": {
+    "high": "Высокая важность",
+    "medium": "Средняя важность",
+    "low": "Низкая важность"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Страница не найдена. Возможно, событие завершилось или ссылка устарела.",
+    "backHome": "На главную"
+  },
+  "footer": {
+    "tagline": "Демонстрационная версия платформы (V1). Данные о матчах, новостях и прогнозах — mock data.",
+    "rights": "Все права защищены."
+  }
+}

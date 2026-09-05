@@ -1,0 +1,179 @@
+{
+  "meta": {
+    "siteName": "Sport.Zone",
+    "defaultTitle": "Sport.Zone — sports analytics and predictions",
+    "defaultDescription": "A modern sports analytics platform: upcoming events, news, predictions and AI-powered analysis across football, hockey, tennis and esports."
+  },
+  "nav": {
+    "home": "Home",
+    "sports": "Sports",
+    "results": "Results",
+    "news": "News",
+    "predictions": "Predictions",
+    "search": "Search"
+  },
+  "common": {
+    "readMore": "Read more",
+    "viewAll": "View all",
+    "viewAllEvents": "All events",
+    "viewAllNews": "All news",
+    "backToSport": "Back to section",
+    "vs": "vs",
+    "today": "Today",
+    "source": "Source",
+    "emptyState": "Nothing to show here yet.",
+    "countdown": {
+      "label": "Starts in",
+      "days": "d",
+      "hours": "h",
+      "minutes": "m",
+      "seconds": "s",
+      "startingSoon": "Starting soon"
+    }
+  },
+  "status": {
+    "scheduled": "Scheduled",
+    "finished": "Finished",
+    "postponed": "Postponed",
+    "cancelled": "Cancelled"
+  },
+  "sports": {
+    "football": { "name": "Football", "shortName": "Football" },
+    "hockey": { "name": "Hockey", "shortName": "Hockey" },
+    "tennis": { "name": "Tennis", "shortName": "Tennis" },
+    "cs2": { "name": "Counter-Strike 2", "shortName": "CS2" },
+    "dota-2": { "name": "Dota 2", "shortName": "Dota 2" },
+    "mobile-legends": { "name": "Mobile Legends: Bang Bang", "shortName": "Mobile Legends" },
+    "ufc": { "name": "UFC", "shortName": "UFC" }
+  },
+  "home": {
+    "heroTitle": "Sports right now — clear and to the point",
+    "heroSubtitle": "Upcoming events, analysis and predictions across seven sports in one place.",
+    "sectionCategories": "Sports",
+    "sectionNews": "Top stories",
+    "sectionUpcoming": "Upcoming events",
+    "sectionPopular": "Popular events",
+    "sectionPredictions": "Predictions",
+    "sectionToday": "What to know today"
+  },
+  "sportPage": {
+    "upcoming": "Upcoming events",
+    "results": "Results",
+    "seeAllResults": "All results",
+    "popular": "Popular events",
+    "news": "News",
+    "articles": "Analysis",
+    "predictions": "Predictions",
+    "teams": "Teams",
+    "metaDescription": "{name}: upcoming events, results, news and predictions."
+  },
+  "comparison": {
+    "title": "Team comparison",
+    "recentForm": "Form (last 5)",
+    "headToHead": "Head-to-head",
+    "meetingsCount": "{count} matches on record",
+    "noMeetings": "These teams haven't met yet — there's no head-to-head data available.",
+    "wins": "Wins",
+    "draws": "Draws",
+    "losses": "Losses",
+    "winsShort": "W",
+    "drawsShort": "D",
+    "lossesShort": "L",
+    "keyStats": "Key stats"
+  },
+  "teamPage": {
+    "roster": "Roster",
+    "recentMatches": "Recent matches",
+    "keyPlayer": "Key player",
+    "backToTeam": "Back to team page",
+    "seeAllResults": "All results for this team",
+    "metaDescription": "{name}: form, upcoming and past matches, roster, news — {sport}."
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Teams, tournaments, articles, news…",
+    "hint": "Start typing to find events, teams, articles and news across every sport.",
+    "noResults": "No results for “{query}”. Try a different team or tournament name.",
+    "resultsCount": "{count} found",
+    "sports": "Sports",
+    "teams": "Teams",
+    "events": "Events",
+    "articles": "Analysis",
+    "news": "News"
+  },
+  "resultsPage": {
+    "title": "Results",
+    "subtitle": "Every finished event across every sport — with filters and search.",
+    "searchPlaceholder": "Team or tournament…",
+    "allSports": "All sports",
+    "allCompetitions": "All tournaments",
+    "period": "Period",
+    "periodAll": "All time",
+    "period7d": "Last 7 days",
+    "period30d": "Last 30 days",
+    "period90d": "Last 3 months",
+    "sortNewest": "Newest first",
+    "sortOldest": "Oldest first",
+    "resultsCount": "{count} events",
+    "noResults": "No events match these filters. Try adjusting them.",
+    "showMore": "Show more",
+    "resetFilters": "Reset filters"
+  },
+  "eventPage": {
+    "tournament": "Tournament",
+    "venue": "Venue",
+    "form": "Form",
+    "lastResults": "Recent results",
+    "statistics": "Statistics",
+    "lineups": "Lineups",
+    "starters": "Starting lineup",
+    "bench": "Bench",
+    "news": "Match news",
+    "keyFactors": "Key factors",
+    "prediction": "AI Match Analysis",
+    "predictionDisclaimer": "A demo model based on mock data. It is not a guarantee of the outcome and should not be used as the sole basis for any decision.",
+    "whatChanged": "What changed?",
+    "whyItMatters": "Why it matters",
+    "related": "Related articles",
+    "homeWin": "Home win",
+    "draw": "Draw",
+    "awayWin": "Away win",
+    "markets": {
+      "title": "Other likely outcomes",
+      "totalTitle": "Total {line}",
+      "over": "Over {line}",
+      "under": "Under {line}",
+      "bttsTitle": "Both teams to score",
+      "yes": "Yes",
+      "no": "No",
+      "handicapTitle": "Handicap",
+      "methodTitle": "Method of victory",
+      "methodFinish": "Wins by finish",
+      "methodDecision": "Wins by decision"
+    }
+  },
+  "articlePage": {
+    "publishedOn": "Published",
+    "updatedOn": "Updated",
+    "relatedEvents": "Related events",
+    "relatedArticles": "Related articles",
+    "demoLabel": "Demo content"
+  },
+  "newsPage": {
+    "relatedTeams": "Mentioned in this story"
+  },
+  "importance": {
+    "high": "High importance",
+    "medium": "Medium importance",
+    "low": "Low importance"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Page not found. The event may have ended, or the link may be out of date.",
+    "backHome": "Back to homepage"
+  },
+  "footer": {
+    "tagline": "A demo version of the platform (V1). Match, news and prediction data is mock data.",
+    "rights": "All rights reserved."
+  }
+}
