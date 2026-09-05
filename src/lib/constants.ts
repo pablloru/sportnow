@@ -25,4 +25,4 @@ export function isSportSlug(value: string): value is (typeof SPORT_SLUGS)[number
   return (SPORT_SLUGS as string[]).includes(value);
 }
 
-export const SITE_NAME = "Sport.Zone";
+export const SITE_NAME = "SportsNew";

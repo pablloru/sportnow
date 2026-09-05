@@ -58,7 +58,7 @@ def make_image(slug, label, c1, c2):
     draw.text(((W - tw) / 2, (H - th) / 2 - 20), label, font=font, fill=(255, 255, 255, 235))
 
     small_font = find_font(28)
-    tag = "SPORT.ZONE"
+    tag = "SPORTSNEW.NET"
     bbox2 = draw.textbbox((0, 0), tag, font=small_font)
     tw2 = bbox2[2] - bbox2[0]
     draw.text(((W - tw2) / 2, (H / 2) + 70), tag, font=small_font, fill=(255, 255, 255, 160))

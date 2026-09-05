@@ -14,7 +14,7 @@ export const ARTICLES: Article[] = [
     image: "/images/football.jpg",
     publishedAt: daysFromNow(-1, 9, 0),
     updatedAt: daysFromNow(0, 8, 0),
-    author: "Sport.Zone Editorial",
+    author: "SportsNew Editorial",
     excerpt:
       "Northbridge United принимают Real Alcazar в матче, который может определить лидера турнирной таблицы. Разбираем ключевые факторы: форму команд, потери в составе и статистику личных встреч.",
     intro:
@@ -45,7 +45,7 @@ export const ARTICLES: Article[] = [
     image: "/images/hockey.jpg",
     publishedAt: daysFromNow(-1, 11, 0),
     updatedAt: daysFromNow(0, 9, 0),
-    author: "Sport.Zone Editorial",
+    author: "SportsNew Editorial",
     excerpt:
       "Steel Bears принимают Arctic Kings в матче, где обе команды выглядят равными по статистике — но потеря ключевого защитника гостей может нарушить баланс.",
     intro:
@@ -76,7 +76,7 @@ export const ARTICLES: Article[] = [
     image: "/images/tennis.jpg",
     publishedAt: daysFromNow(-2, 10, 0),
     updatedAt: daysFromNow(-1, 9, 0),
-    author: "Sport.Zone Editorial",
+    author: "SportsNew Editorial",
     excerpt:
       "D. Volkov и A. Takahashi встретятся на центральном корте Grand Circuit Masters — Volkov ведёт в личных встречах, но соперник подходит к игре на серии побед.",
     intro:
@@ -104,7 +104,7 @@ export const ARTICLES: Article[] = [
     image: "/images/cs2.jpg",
     publishedAt: daysFromNow(-1, 12, 0),
     updatedAt: daysFromNow(0, 10, 0),
-    author: "Sport.Zone Editorial",
+    author: "SportsNew Editorial",
     excerpt:
       "Nova Sentinel подходят к матчу на серии из четырёх побед подряд, но пул карт Vertex Gaming делает встречу менее предсказуемой, чем кажется на первый взгляд.",
     intro:
@@ -131,7 +131,7 @@ export const ARTICLES: Article[] = [
     image: "/images/dota-2.jpg",
     publishedAt: daysFromNow(-1, 13, 0),
     updatedAt: daysFromNow(0, 9, 30),
-    author: "Sport.Zone Editorial",
+    author: "SportsNew Editorial",
     excerpt:
       "Ember Guard выиграли последнюю серию со счётом 2:0 и подходят к матчу с Titan Forge в статусе фаворита — но соперник силён на ранней стадии игры.",
     intro:
@@ -158,7 +158,7 @@ export const ARTICLES: Article[] = [
     image: "/images/mobile-legends.jpg",
     publishedAt: daysFromNow(-1, 9, 30),
     updatedAt: daysFromNow(0, 8, 0),
-    author: "Sport.Zone Editorial",
+    author: "SportsNew Editorial",
     excerpt:
       "Solar Flare подходят к полуфиналу на волне камбэк-победы и выигранных 4 из последних 5 матчей — Golden Spire предстоит искать ответ на их позднюю игру.",
     intro:
@@ -185,7 +185,7 @@ export const ARTICLES: Article[] = [
     image: "/images/football.jpg",
     publishedAt: daysFromNow(0, 8, 0),
     updatedAt: daysFromNow(0, 8, 0),
-    author: "Sport.Zone Editorial",
+    author: "SportsNew Editorial",
     excerpt:
       "Перед новым туром Continental Premier League разбираем форму шести клубов лиги — от уверенной серии Real Alcazar до нестабильных результатов Vantage Athletic.",
     intro:
@@ -214,7 +214,7 @@ export const ARTICLES: Article[] = [
     image: "/images/ufc.jpg",
     publishedAt: daysFromNow(-1, 9, 0),
     updatedAt: daysFromNow(0, 8, 0),
-    author: "Sport.Zone Editorial",
+    author: "SportsNew Editorial",
     excerpt:
       "Dominic Vance и Kenji Osei подходят к бою в практически одинаковой форме — 4 победы в последних 5 боях у каждого. Разбираем, что может стать решающим фактором.",
     intro:

@@ -8,7 +8,7 @@ export const SOURCES: Source[] = [
   { id: "src-sportswire", name: "SportsWire", kind: "news" },
   { id: "src-oddsmetrics", name: "OddsMetrics", kind: "odds" },
   { id: "src-statcenter", name: "StatCenter", kind: "stats" },
-  { id: "src-editorial", name: "Sport.Zone Editorial", kind: "editorial" },
+  { id: "src-editorial", name: "SportsNew Editorial", kind: "editorial" },
 ];
 
 export function getSource(id: string): Pick<Source, "id" | "name"> {
