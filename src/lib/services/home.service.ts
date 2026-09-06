@@ -25,10 +25,18 @@ export async function getHomePageData(locale: AppLocale = "ru") {
     }))
   );
 
+  // Paired with the event it's about (not just the raw insight) so the
+  // homepage card can show which match this is and link straight to it
+  // — an insight with no visible match context reads as a floating,
+  // unclickable fact ("the home team's striker will miss the match" —
+  // which match?).
   const topInsights = await Promise.all(
     popular
       .filter((e) => e.hasIntelligence)
-      .map((e) => intelligenceRepository.getInsights(e.id, locale))
+      .map(async (event) => {
+        const insights = await intelligenceRepository.getInsights(event.id, locale);
+        return insights.map((insight) => ({ insight, event }));
+      })
   );
 
   return {

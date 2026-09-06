@@ -1,13 +1,16 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 
-/** A row of jump-links shown right at the top of the homepage, above the
- * hero banner, so a first-time visitor sees the site's whole menu of
- * content (today's picks, upcoming events, predictions, news, results)
- * before scrolling at all. The first four are same-page anchors (plain
- * <a href="#...">, smoothed by the global `scroll-smooth` on <html> — no
- * client JS needed); "Results" is a real link to its own page. Targets
- * live on the sections below in this file and must keep matching ids. */
+/** A row of jump-links pinned right below the sticky Header (which is
+ * 115px tall: 3px accent bar + 60px logo row + 52px sport-switcher row —
+ * see the matching `scroll-mt-44` on the target sections below), so a
+ * first-time visitor sees the site's whole menu of content (today's
+ * picks, upcoming events, predictions, news, results) before scrolling
+ * at all, and it stays reachable while scrolling. The first four are
+ * same-page anchors (plain <a href="#...">, smoothed by the global
+ * `scroll-smooth` on <html> — no client JS needed); "Results" is a real
+ * link to its own page. Full-bleed like Header (outer bar + inner
+ * max-w-7xl row) so it doesn't look like a floating fragment when stuck. */
 export async function QuickNav() {
   const t = await getTranslations("home");
 
@@ -19,32 +22,37 @@ export async function QuickNav() {
   ];
 
   return (
-    <nav aria-label={t("quickNavLabel")} className="flex items-center gap-3">
-      <span className="hidden shrink-0 text-xs font-medium uppercase tracking-wide text-[var(--muted)] sm:inline">
-        {t("quickNavLabel")}
-      </span>
-      <div className="scrollbar-none flex flex-1 gap-2 overflow-x-auto">
-        {items.map((item) => (
-          <a
-            key={item.href}
-            href={item.href}
+    <div className="sticky top-[115px] z-30 border-b border-white/10 bg-[var(--background)]/90 backdrop-blur">
+      <nav
+        aria-label={t("quickNavLabel")}
+        className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6"
+      >
+        <span className="hidden shrink-0 text-xs font-medium uppercase tracking-wide text-[var(--muted)] sm:inline">
+          {t("quickNavLabel")}
+        </span>
+        <div className="scrollbar-none flex flex-1 gap-2 overflow-x-auto">
+          {items.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:border-[rgba(var(--brand-rgb),0.4)] hover:bg-[rgba(var(--brand-rgb),0.12)] hover:text-white"
+            >
+              <span className="text-[var(--brand)]">{item.icon}</span>
+              {item.label}
+            </a>
+          ))}
+          <Link
+            href="/results"
             className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:border-[rgba(var(--brand-rgb),0.4)] hover:bg-[rgba(var(--brand-rgb),0.12)] hover:text-white"
           >
-            <span className="text-[var(--brand)]">{item.icon}</span>
-            {item.label}
-          </a>
-        ))}
-        <Link
-          href="/results"
-          className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:border-[rgba(var(--brand-rgb),0.4)] hover:bg-[rgba(var(--brand-rgb),0.12)] hover:text-white"
-        >
-          <span className="text-[var(--brand)]">
-            <IconFlag />
-          </span>
-          {t("quickNavResults")}
-        </Link>
-      </div>
-    </nav>
+            <span className="text-[var(--brand)]">
+              <IconFlag />
+            </span>
+            {t("quickNavResults")}
+          </Link>
+        </div>
+      </nav>
+    </div>
   );
 }
 

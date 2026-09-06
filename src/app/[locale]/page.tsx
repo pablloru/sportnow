@@ -39,9 +39,9 @@ export default async function HomePage({
     await getHomePageData(locale as AppLocale);
 
   return (
-    <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6">
+    <>
       <QuickNav />
-
+      <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6">
       <section className="bg-dot-grid relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-8 sm:p-12">
         <div
           className="pointer-events-none absolute -right-28 -top-28 h-80 w-80 rounded-full bg-[var(--brand)]/25 blur-3xl"
@@ -69,13 +69,13 @@ export default async function HomePage({
       </section>
 
       {todayInsights.length > 0 && (
-        <section id="section-today" className="scroll-mt-32">
+        <section id="section-today" className="scroll-mt-44">
           <SectionHeading title={t("sectionToday")} />
           <TodayInsights insights={todayInsights} />
         </section>
       )}
 
-      <section id="section-upcoming" className="scroll-mt-32">
+      <section id="section-upcoming" className="scroll-mt-44">
         <SectionHeading title={t("sectionUpcoming")} />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {upcoming.map((event) => (
@@ -96,7 +96,7 @@ export default async function HomePage({
       )}
 
       {predictions.length > 0 && (
-        <section id="section-predictions" className="scroll-mt-32">
+        <section id="section-predictions" className="scroll-mt-44">
           <SectionHeading title={t("sectionPredictions")} />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {predictions.map(
@@ -107,7 +107,7 @@ export default async function HomePage({
         </section>
       )}
 
-      <section id="section-news" className="scroll-mt-32">
+      <section id="section-news" className="scroll-mt-44">
         <SectionHeading title={t("sectionNews")} />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {latestNews.map((news) => (
@@ -116,5 +116,6 @@ export default async function HomePage({
         </div>
       </section>
     </div>
+    </>
   );
 }
