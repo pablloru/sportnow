@@ -81,7 +81,11 @@
     "quickNavPredictions": "Прогнозы",
     "quickNavNews": "Новости",
     "quickNavResults": "Результаты",
-    "quickNavLabel": "На сайте:"
+    "quickNavLabel": "На сайте:",
+    "sectionFavorites": "Ваши команды",
+    "favoritesEmpty": "Добавьте любимые команды в избранное — на странице команды нажмите на звёздочку рядом с названием — и здесь будут появляться их ближайшие матчи и новости.",
+    "favoritesEmptyCta": "Найти команду",
+    "favoritesNoUpcoming": "Ближайших матчей и новостей по вашим командам пока нет — загляните позже."
   },
   "sportPage": {
     "upcoming": "Ближайшие события",
@@ -114,7 +118,9 @@
     "keyPlayer": "Ключевой игрок",
     "backToTeam": "К странице команды",
     "seeAllResults": "Все результаты команды",
-    "metaDescription": "{name}: форма, ближайшие и прошедшие матчи, состав, новости — {sport}."
+    "metaDescription": "{name}: форма, ближайшие и прошедшие матчи, состав, новости — {sport}.",
+    "followTeam": "Добавить {name} в избранное",
+    "unfollowTeam": "Убрать {name} из избранного"
   },
   "search": {
     "title": "Поиск",
@@ -156,8 +162,9 @@
     "starters": "Основной состав",
     "bench": "Запасные",
     "news": "Новости по матчу",
-    "keyFactors": "Ключевые факторы",
+    "injuryReport": "Травмы и отсутствия",
     "prediction": "AI Match Analysis",
+    "predictionFactorsTitle": "На чём основан этот прогноз",
     "predictionDisclaimer": "Демонстрационная модель на основе mock-данных. Не является гарантией результата и не должна использоваться как единственное основание для решений.",
     "whatChanged": "Что изменилось?",
     "whyItMatters": "Почему это важно?",

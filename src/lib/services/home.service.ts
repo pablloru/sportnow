@@ -11,11 +11,18 @@ import type { AppLocale } from "@/i18n/routing";
  * seam where caching / request deduplication would be added later.
  */
 export async function getHomePageData(locale: AppLocale = "ru") {
-  const [sports, upcoming, popular, latestNews] = await Promise.all([
+  const [sports, upcoming, popular, latestNews, allUpcoming, allNews] = await Promise.all([
     sportRepository.listAll(),
     eventRepository.listUpcoming(6),
     eventRepository.listPopular(4),
     newsRepository.listLatest(6, locale),
+    // Unfiltered/unlimited — backs the client-side "Your teams"
+    // favorites section, which needs to search across every sport for
+    // a followed team's matches, not just the homepage's curated
+    // handful. Cheap at this dataset's size; would become a real
+    // "matches for these team ids" query once this is a live API.
+    eventRepository.listUpcoming(),
+    newsRepository.listAll(locale),
   ]);
 
   const predictedEvents = await Promise.all(
@@ -44,6 +51,8 @@ export async function getHomePageData(locale: AppLocale = "ru") {
     upcoming,
     popular,
     latestNews,
+    allUpcoming,
+    allNews,
     predictions: predictedEvents.filter((p) => p.prediction),
     todayInsights: topInsights.flat().slice(0, 3),
   };

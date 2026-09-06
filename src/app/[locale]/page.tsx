@@ -10,6 +10,7 @@ import { NewsCard } from "@/components/home/NewsCard";
 import { PredictionMiniCard } from "@/components/home/PredictionMiniCard";
 import { TodayInsights } from "@/components/home/TodayInsights";
 import { QuickNav } from "@/components/home/QuickNav";
+import { FavoriteTeamsSection } from "@/components/home/FavoriteTeamsSection";
 
 export async function generateMetadata({
   params,
@@ -35,7 +36,7 @@ export default async function HomePage({
 
   const t = await getTranslations("home");
   const tSports = await getTranslations("sports");
-  const { sports, upcoming, popular, latestNews, predictions, todayInsights } =
+  const { sports, upcoming, popular, latestNews, predictions, todayInsights, allUpcoming, allNews } =
     await getHomePageData(locale as AppLocale);
 
   return (
@@ -63,7 +64,9 @@ export default async function HomePage({
         </div>
       </section>
 
-      <section>
+      <FavoriteTeamsSection upcoming={allUpcoming} news={allNews} />
+
+      <section id="section-categories" className="scroll-mt-44">
         <SectionHeading title={t("sectionCategories")} />
         <SportCategoryGrid sports={sports} />
       </section>

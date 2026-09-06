@@ -63,7 +63,7 @@ export function PredictionBlock({
       )}
 
       <div className="mt-5 border-t border-white/10 pt-4">
-        <h4 className="mb-2 text-sm font-medium text-white">{t("keyFactors")}</h4>
+        <h4 className="mb-2 text-sm font-medium text-white">{t("predictionFactorsTitle")}</h4>
         <ul className="space-y-2">
           {prediction.factors.map((factor) => (
             <li key={factor.label} className="text-sm text-[var(--muted)]">

@@ -16,6 +16,7 @@ import { EventCard } from "@/components/event/EventCard";
 import { NewsCard } from "@/components/home/NewsCard";
 import { RosterGrid } from "@/components/team/RosterGrid";
 import { BackLink } from "@/components/ui/BackLink";
+import { FavoriteTeamButton } from "@/components/team/FavoriteTeamButton";
 
 type Props = { params: Promise<{ locale: string; sport: string; slug: string }> };
 
@@ -106,6 +107,7 @@ export default async function TeamPage({ params }: Props) {
               </h1>
               {team.country && <p className="text-sm text-[var(--muted)]">{team.country}</p>}
             </div>
+            <FavoriteTeamButton teamId={team.id} teamName={team.name} />
           </div>
           {team.form && team.form.length > 0 && (
             <div className="text-right">

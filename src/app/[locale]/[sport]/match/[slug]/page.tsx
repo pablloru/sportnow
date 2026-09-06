@@ -171,7 +171,7 @@ export default async function EventPage({ params }: Props) {
 
       {injuries.length > 0 && (
         <Card className="p-5">
-          <h3 className="mb-3 text-base font-semibold text-white">{t("keyFactors")}</h3>
+          <h3 className="mb-3 text-base font-semibold text-white">{t("injuryReport")}</h3>
           <ul className="space-y-2">
             {injuries.map((injury) => (
               <li key={injury.id} className="text-sm text-[var(--muted)]">

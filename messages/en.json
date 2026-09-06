@@ -81,7 +81,11 @@
     "quickNavPredictions": "Predictions",
     "quickNavNews": "News",
     "quickNavResults": "Results",
-    "quickNavLabel": "On this site:"
+    "quickNavLabel": "On this site:",
+    "sectionFavorites": "Your teams",
+    "favoritesEmpty": "Follow your favorite teams — tap the star next to a team's name on its page — and their upcoming matches and news will show up here.",
+    "favoritesEmptyCta": "Find a team",
+    "favoritesNoUpcoming": "No upcoming matches or news for your teams right now — check back later."
   },
   "sportPage": {
     "upcoming": "Upcoming events",
@@ -114,7 +118,9 @@
     "keyPlayer": "Key player",
     "backToTeam": "Back to team page",
     "seeAllResults": "All results for this team",
-    "metaDescription": "{name}: form, upcoming and past matches, roster, news — {sport}."
+    "metaDescription": "{name}: form, upcoming and past matches, roster, news — {sport}.",
+    "followTeam": "Follow {name}",
+    "unfollowTeam": "Unfollow {name}"
   },
   "search": {
     "title": "Search",
@@ -156,8 +162,9 @@
     "starters": "Starting lineup",
     "bench": "Bench",
     "news": "Match news",
-    "keyFactors": "Key factors",
+    "injuryReport": "Injury report",
     "prediction": "AI Match Analysis",
+    "predictionFactorsTitle": "What this prediction is based on",
     "predictionDisclaimer": "A demo model based on mock data. It is not a guarantee of the outcome and should not be used as the sole basis for any decision.",
     "whatChanged": "What changed?",
     "whyItMatters": "Why it matters",
