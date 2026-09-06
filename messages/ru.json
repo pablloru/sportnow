@@ -38,13 +38,34 @@
     "cancelled": "Отменён"
   },
   "sports": {
-    "football": { "name": "Футбол", "shortName": "Футбол" },
-    "hockey": { "name": "Хоккей", "shortName": "Хоккей" },
-    "tennis": { "name": "Теннис", "shortName": "Теннис" },
-    "cs2": { "name": "Counter-Strike 2", "shortName": "CS2" },
-    "dota-2": { "name": "Dota 2", "shortName": "Dota 2" },
-    "mobile-legends": { "name": "Mobile Legends: Bang Bang", "shortName": "Mobile Legends" },
-    "ufc": { "name": "UFC", "shortName": "UFC" }
+    "football": {
+      "name": "Футбол",
+      "shortName": "Футбол"
+    },
+    "hockey": {
+      "name": "Хоккей",
+      "shortName": "Хоккей"
+    },
+    "tennis": {
+      "name": "Теннис",
+      "shortName": "Теннис"
+    },
+    "cs2": {
+      "name": "Counter-Strike 2",
+      "shortName": "CS2"
+    },
+    "dota-2": {
+      "name": "Dota 2",
+      "shortName": "Dota 2"
+    },
+    "mobile-legends": {
+      "name": "Mobile Legends: Bang Bang",
+      "shortName": "Mobile Legends"
+    },
+    "ufc": {
+      "name": "UFC",
+      "shortName": "UFC"
+    }
   },
   "home": {
     "heroTitle": "Спорт прямо сейчас — понятно и по делу",
@@ -54,7 +75,13 @@
     "sectionUpcoming": "Ближайшие события",
     "sectionPopular": "Популярные события",
     "sectionPredictions": "Прогнозы",
-    "sectionToday": "Что важно знать сегодня"
+    "sectionToday": "Что важно знать сегодня",
+    "quickNavToday": "Сегодня",
+    "quickNavUpcoming": "События",
+    "quickNavPredictions": "Прогнозы",
+    "quickNavNews": "Новости",
+    "quickNavResults": "Результаты",
+    "quickNavLabel": "На сайте:"
   },
   "sportPage": {
     "upcoming": "Ближайшие события",

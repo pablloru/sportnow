@@ -3,14 +3,13 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getHomePageData } from "@/lib/services/home.service";
 import { localeAlternates } from "@/lib/seo";
 import type { AppLocale } from "@/i18n/routing";
-import { Link } from "@/i18n/navigation";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SportCategoryGrid } from "@/components/home/SportCategoryGrid";
-import { SportIcon } from "@/components/ui/SportIcon";
 import { EventCard } from "@/components/event/EventCard";
 import { NewsCard } from "@/components/home/NewsCard";
 import { PredictionMiniCard } from "@/components/home/PredictionMiniCard";
 import { TodayInsights } from "@/components/home/TodayInsights";
+import { QuickNav } from "@/components/home/QuickNav";
 
 export async function generateMetadata({
   params,
@@ -41,6 +40,8 @@ export default async function HomePage({
 
   return (
     <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6">
+      <QuickNav />
+
       <section className="bg-dot-grid relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-8 sm:p-12">
         <div
           className="pointer-events-none absolute -right-28 -top-28 h-80 w-80 rounded-full bg-[var(--brand)]/25 blur-3xl"
@@ -60,18 +61,6 @@ export default async function HomePage({
           </h1>
           <p className="mt-4 text-base text-[var(--muted)] sm:text-lg">{t("heroSubtitle")}</p>
         </div>
-        <div className="scrollbar-none relative mt-8 flex gap-2 overflow-x-auto">
-          {sports.map((sport) => (
-            <Link
-              key={sport.slug}
-              href={`/${sport.slug}`}
-              className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:border-[rgba(var(--brand-rgb),0.4)] hover:bg-[rgba(var(--brand-rgb),0.12)] hover:text-white"
-            >
-              <SportIcon sport={sport.slug} className="h-3.5 w-3.5 text-[var(--brand)]" />
-              {tSports(`${sport.slug}.shortName`)}
-            </Link>
-          ))}
-        </div>
       </section>
 
       <section>
@@ -80,13 +69,13 @@ export default async function HomePage({
       </section>
 
       {todayInsights.length > 0 && (
-        <section>
+        <section id="section-today" className="scroll-mt-32">
           <SectionHeading title={t("sectionToday")} />
           <TodayInsights insights={todayInsights} />
         </section>
       )}
 
-      <section>
+      <section id="section-upcoming" className="scroll-mt-32">
         <SectionHeading title={t("sectionUpcoming")} />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {upcoming.map((event) => (
@@ -107,7 +96,7 @@ export default async function HomePage({
       )}
 
       {predictions.length > 0 && (
-        <section>
+        <section id="section-predictions" className="scroll-mt-32">
           <SectionHeading title={t("sectionPredictions")} />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {predictions.map(
@@ -118,7 +107,7 @@ export default async function HomePage({
         </section>
       )}
 
-      <section>
+      <section id="section-news" className="scroll-mt-32">
         <SectionHeading title={t("sectionNews")} />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {latestNews.map((news) => (

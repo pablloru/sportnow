@@ -38,13 +38,34 @@
     "cancelled": "Cancelled"
   },
   "sports": {
-    "football": { "name": "Football", "shortName": "Football" },
-    "hockey": { "name": "Hockey", "shortName": "Hockey" },
-    "tennis": { "name": "Tennis", "shortName": "Tennis" },
-    "cs2": { "name": "Counter-Strike 2", "shortName": "CS2" },
-    "dota-2": { "name": "Dota 2", "shortName": "Dota 2" },
-    "mobile-legends": { "name": "Mobile Legends: Bang Bang", "shortName": "Mobile Legends" },
-    "ufc": { "name": "UFC", "shortName": "UFC" }
+    "football": {
+      "name": "Football",
+      "shortName": "Football"
+    },
+    "hockey": {
+      "name": "Hockey",
+      "shortName": "Hockey"
+    },
+    "tennis": {
+      "name": "Tennis",
+      "shortName": "Tennis"
+    },
+    "cs2": {
+      "name": "Counter-Strike 2",
+      "shortName": "CS2"
+    },
+    "dota-2": {
+      "name": "Dota 2",
+      "shortName": "Dota 2"
+    },
+    "mobile-legends": {
+      "name": "Mobile Legends: Bang Bang",
+      "shortName": "Mobile Legends"
+    },
+    "ufc": {
+      "name": "UFC",
+      "shortName": "UFC"
+    }
   },
   "home": {
     "heroTitle": "Sports right now — clear and to the point",
@@ -54,7 +75,13 @@
     "sectionUpcoming": "Upcoming events",
     "sectionPopular": "Popular events",
     "sectionPredictions": "Predictions",
-    "sectionToday": "What to know today"
+    "sectionToday": "What to know today",
+    "quickNavToday": "Today",
+    "quickNavUpcoming": "Events",
+    "quickNavPredictions": "Predictions",
+    "quickNavNews": "News",
+    "quickNavResults": "Results",
+    "quickNavLabel": "On this site:"
   },
   "sportPage": {
     "upcoming": "Upcoming events",
