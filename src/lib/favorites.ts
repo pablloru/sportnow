@@ -20,6 +20,7 @@ const STORAGE_KEYS: Record<FavoriteKind, string> = {
 };
 
 const CHANGE_EVENT = "sportsnew:favorites-change";
+const TOAST_EVENT = "sportsnew:favorite-toast";
 
 const EMPTY: string[] = [];
 
@@ -75,10 +76,29 @@ export function getServerFavoriteIds(): string[] {
   return EMPTY;
 }
 
-export function toggleFavorite(kind: FavoriteKind, id: string): string[] {
+/** What a toggle just did — enough for a confirmation toast to say
+ * "added/removed <label>" and offer a way to the favorites page,
+ * without the toast needing to know anything about teams or events
+ * itself. */
+export type FavoriteToastDetail = { kind: FavoriteKind; active: boolean; label: string };
+
+/**
+ * Flips one id in one kind's list. `label` is optional and purely
+ * cosmetic — when given (the team/match's display name), a toast
+ * event fires so the visitor gets an explicit confirmation of what
+ * just happened and a way to the favorites page, instead of a bare
+ * icon silently changing color and hoping they noticed.
+ */
+export function toggleFavorite(kind: FavoriteKind, id: string, label?: string): string[] {
   const current = readIds(kind);
-  const next = current.includes(id) ? current.filter((existing) => existing !== id) : [...current, id];
+  const willBeActive = !current.includes(id);
+  const next = willBeActive ? [...current, id] : current.filter((existing) => existing !== id);
   writeIds(kind, next);
+  if (label && typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent<FavoriteToastDetail>(TOAST_EVENT, { detail: { kind, active: willBeActive, label } })
+    );
+  }
   return next;
 }
 
@@ -95,4 +115,15 @@ export function subscribeFavorites(callback: () => void): () => void {
     window.removeEventListener(CHANGE_EVENT, callback);
     window.removeEventListener("storage", callback);
   };
+}
+
+/** Subscribes to the one-shot toast notifications toggleFavorite fires
+ * (see FavoriteToastDetail). Separate from subscribeFavorites because
+ * this is an event stream (one message per toggle), not a snapshot of
+ * current state — useSyncExternalStore doesn't apply here. */
+export function subscribeFavoriteToast(callback: (detail: FavoriteToastDetail) => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  const handler = (event: Event) => callback((event as CustomEvent<FavoriteToastDetail>).detail);
+  window.addEventListener(TOAST_EVENT, handler);
+  return () => window.removeEventListener(TOAST_EVENT, handler);
 }

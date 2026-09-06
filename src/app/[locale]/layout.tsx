@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing";
 import { localeAlternates } from "@/lib/seo";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { FavoriteToast } from "@/components/layout/FavoriteToast";
 import "../globals.css";
 // Condensed display face for headlines/scores/kickers — the "sports
 // broadcast" texture the rest of the chrome is built around. Loaded from
@@ -76,6 +77,7 @@ export default async function LocaleLayout({
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <FavoriteToast />
         </NextIntlClientProvider>
       </body>
     </html>

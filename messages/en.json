@@ -30,7 +30,9 @@
       "minutes": "m",
       "seconds": "s",
       "startingSoon": "Starting soon"
-    }
+    },
+    "addToFavorites": "Add to favorites",
+    "inFavorites": "In favorites"
   },
   "status": {
     "scheduled": "Scheduled",
@@ -215,8 +217,15 @@
     "intro": "Teams and events you're following. Tap any one of them to open its page.",
     "sectionTeams": "Teams",
     "sectionEvents": "Events",
-    "emptyTeams": "You haven't followed any teams yet — tap the star on a team's page.",
-    "emptyEvents": "You haven't followed any events yet — tap the star on a match's page.",
+    "emptyTeams": "You haven't added any teams to favorites yet — tap \"Add to favorites\" on a team's page.",
+    "emptyEvents": "You haven't added any events to favorites yet — tap \"Add to favorites\" on a match's page.",
     "emptyCta": "Find a team or event"
+  },
+  "favoritesToast": {
+    "addedTeam": "Added to favorites: {name}",
+    "removedTeam": "Removed from favorites: {name}",
+    "addedEvent": "Match added to favorites: {name}",
+    "removedEvent": "Match removed from favorites: {name}",
+    "view": "View favorites"
   }
 }

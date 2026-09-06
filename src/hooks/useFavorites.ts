@@ -22,9 +22,12 @@ export function useFavorites(kind: FavoriteKind) {
   const getSnapshot = useCallback(() => getFavoriteIds(kind), [kind]);
   const ids = useSyncExternalStore(subscribeFavorites, getSnapshot, getServerFavoriteIds);
 
+  // `label` is optional and purely cosmetic — pass the team/match's
+  // display name to get a confirmation toast (see FavoriteToast); omit
+  // it for a silent toggle.
   const toggle = useCallback(
-    (id: string) => {
-      toggleFavorite(kind, id);
+    (id: string, label?: string) => {
+      toggleFavorite(kind, id, label);
     },
     [kind]
   );
