@@ -53,6 +53,26 @@ export function Header() {
               <path d="m20 20-3.5-3.5" strokeLinecap="round" />
             </svg>
           </Link>
+          <Link
+            href="/favorites"
+            aria-label={tNav("favorites")}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden
+            >
+              <path
+                d="m12 3 2.6 5.86 6.4.6-4.8 4.3 1.4 6.24L12 16.9l-5.6 3.1 1.4-6.24-4.8-4.3 6.4-.6L12 3Z"
+                strokeLinejoin="round"
+                strokeLinecap="round"
+              />
+            </svg>
+          </Link>
         </div>
       </div>
       <div className="mx-auto max-w-7xl px-4 pb-3 sm:px-6">

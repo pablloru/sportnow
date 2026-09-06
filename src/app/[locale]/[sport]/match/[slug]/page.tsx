@@ -20,6 +20,7 @@ import { FormStrip } from "@/components/event/FormStrip";
 import { TeamComparisonPanel } from "@/components/event/TeamComparisonPanel";
 import { LineupPanel } from "@/components/event/LineupPanel";
 import { PredictionBlock } from "@/components/event/PredictionBlock";
+import { FavoriteEventButton } from "@/components/event/FavoriteEventButton";
 import { IntelligencePanel } from "@/components/event/IntelligencePanel";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { NewsCard } from "@/components/home/NewsCard";
@@ -127,7 +128,10 @@ export default async function EventPage({ params }: Props) {
           <span>
             {t("tournament")}: <span className="text-white">{event.competition.name}</span>
           </span>
-          <StatusPill status={event.status} />
+          <div className="flex items-center gap-2">
+            <StatusPill status={event.status} />
+            <FavoriteEventButton eventId={event.id} matchLabel={`${event.home.team.name} — ${event.away.team.name}`} />
+          </div>
         </div>
 
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">

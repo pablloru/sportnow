@@ -4,22 +4,25 @@ import { useTranslations } from "next-intl";
 import { clsx } from "clsx";
 import { useFavorites } from "@/hooks/useFavorites";
 
-/** The one client-interactive island on an otherwise server-rendered
- * team page. Favorited team ids are read back on the dedicated
- * favorites page (see /favorites). */
-export function FavoriteTeamButton({ teamId, teamName }: { teamId: string; teamName: string }) {
-  const t = useTranslations("teamPage");
-  const { isFavorite, toggle } = useFavorites("team");
-  const active = isFavorite(teamId);
+/** Same star-toggle pattern as FavoriteTeamButton, for a single match
+ * instead of a team — lets a visitor track one upcoming event without
+ * having to follow either team playing in it. Sized smaller than the
+ * team-page button so it sits comfortably in the match header's
+ * tournament/status row. Favorited event ids are read back on the
+ * dedicated favorites page (see /favorites). */
+export function FavoriteEventButton({ eventId, matchLabel }: { eventId: string; matchLabel: string }) {
+  const t = useTranslations("eventPage");
+  const { isFavorite, toggle } = useFavorites("event");
+  const active = isFavorite(eventId);
 
   return (
     <button
       type="button"
-      onClick={() => toggle(teamId)}
+      onClick={() => toggle(eventId)}
       aria-pressed={active}
-      aria-label={active ? t("unfollowTeam", { name: teamName }) : t("followTeam", { name: teamName })}
+      aria-label={active ? t("unfollowEvent", { match: matchLabel }) : t("followEvent", { match: matchLabel })}
       className={clsx(
-        "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-colors",
+        "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-colors",
         active
           ? "border-[var(--brand)] bg-[rgba(var(--brand-rgb),0.16)] text-[var(--brand)]"
           : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20 hover:text-white"
@@ -33,7 +36,7 @@ export function FavoriteTeamButton({ teamId, teamName }: { teamId: string; teamN
 function StarIcon({ filled }: { filled: boolean }) {
   return (
     <svg
-      className="h-5 w-5"
+      className="h-4 w-4"
       viewBox="0 0 24 24"
       fill={filled ? "currentColor" : "none"}
       stroke="currentColor"

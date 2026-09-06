@@ -10,7 +10,8 @@
     "results": "Results",
     "news": "News",
     "predictions": "Predictions",
-    "search": "Search"
+    "search": "Search",
+    "favorites": "Favorites"
   },
   "common": {
     "readMore": "Read more",
@@ -81,11 +82,7 @@
     "quickNavPredictions": "Predictions",
     "quickNavNews": "News",
     "quickNavResults": "Results",
-    "quickNavLabel": "On this site:",
-    "sectionFavorites": "Your teams",
-    "favoritesEmpty": "Follow your favorite teams — tap the star next to a team's name on its page — and their upcoming matches and news will show up here.",
-    "favoritesEmptyCta": "Find a team",
-    "favoritesNoUpcoming": "No upcoming matches or news for your teams right now — check back later."
+    "quickNavLabel": "On this site:"
   },
   "sportPage": {
     "upcoming": "Upcoming events",
@@ -184,7 +181,9 @@
       "methodTitle": "Method of victory",
       "methodFinish": "Wins by finish",
       "methodDecision": "Wins by decision"
-    }
+    },
+    "followEvent": "Follow the {match} match",
+    "unfollowEvent": "Unfollow the {match} match"
   },
   "articlePage": {
     "publishedOn": "Published",
@@ -209,5 +208,15 @@
   "footer": {
     "tagline": "A demo version of the platform (V1). Match, news and prediction data is mock data.",
     "rights": "All rights reserved."
+  },
+  "favoritesPage": {
+    "title": "Favorites",
+    "metaDescription": "Your favorite teams and events, all in one place.",
+    "intro": "Teams and events you're following. Tap any one of them to open its page.",
+    "sectionTeams": "Teams",
+    "sectionEvents": "Events",
+    "emptyTeams": "You haven't followed any teams yet — tap the star on a team's page.",
+    "emptyEvents": "You haven't followed any events yet — tap the star on a match's page.",
+    "emptyCta": "Find a team or event"
   }
 }
