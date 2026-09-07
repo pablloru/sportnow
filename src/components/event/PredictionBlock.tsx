@@ -25,7 +25,12 @@ export function PredictionBlock({
   return (
     <Card className="p-5">
       <div className="mb-4 flex items-center justify-between gap-2">
-        <h3 className="text-base font-semibold text-white">{t("prediction")}</h3>
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[rgba(var(--brand-rgb),0.16)] text-[var(--brand)]">
+            <SparkleIcon />
+          </span>
+          <h3 className="text-base font-semibold text-white">{t("predictionTitle")}</h3>
+        </div>
         <div className="flex items-center gap-1.5">
           {prediction.isDemo && <Badge tone="warning">Demo</Badge>}
         </div>
@@ -73,10 +78,18 @@ export function PredictionBlock({
         </ul>
       </div>
 
-      <p className="mt-4 border-t border-white/10 pt-3 text-xs leading-relaxed text-[var(--muted)]">
+      <p className="mt-4 border-t border-white/10 pt-3 text-xs leading-relaxed text-[var(--muted)] opacity-60">
         {t("predictionDisclaimer")}
       </p>
     </Card>
+  );
+}
+
+function SparkleIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 2.5c.3 2.9 1 5 2.1 6.1S17.6 10.4 20.5 10.7c-2.9.3-5 1-6.4 2.4S12 16.8 11.7 19.7c-.3-2.9-1-5-2.4-6.4S6 11.9 3.1 11.6c2.9-.3 5-1 6.4-2.4S11.7 5.4 12 2.5Z" />
+    </svg>
   );
 }
 

@@ -19,9 +19,8 @@ import { LocalDateTime } from "@/components/ui/LocalDateTime";
 import { FormStrip } from "@/components/event/FormStrip";
 import { TeamComparisonPanel } from "@/components/event/TeamComparisonPanel";
 import { LineupPanel } from "@/components/event/LineupPanel";
-import { PredictionBlock } from "@/components/event/PredictionBlock";
+import { PredictionGenerator } from "@/components/event/PredictionGenerator";
 import { FavoriteEventButton } from "@/components/event/FavoriteEventButton";
-import { IntelligencePanel } from "@/components/event/IntelligencePanel";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { NewsCard } from "@/components/home/NewsCard";
 import { ArticleCard } from "@/components/article/ArticleCard";
@@ -62,21 +61,17 @@ export default async function EventPage({ params }: Props) {
   const event = await eventRepository.getBySlug(sport, slug);
   if (!event) notFound();
 
-  const [t, intelligence, lineups, homeInjuries, awayInjuries, relatedNews, articles, headToHead] =
-    await Promise.all([
-      getTranslations("eventPage"),
-      getMatchIntelligence(event.id, locale as AppLocale),
-      eventRepository.getLineups(event.id),
-      eventRepository.getInjuriesForTeam(event.home.team.id, locale as AppLocale),
-      eventRepository.getInjuriesForTeam(event.away.team.id, locale as AppLocale),
-      newsRepository.listBySport(sport, 20, locale as AppLocale),
-      articleRepository.listAll(locale as AppLocale),
-      eventRepository.getHeadToHead(event.home.team.id, event.away.team.id, event.id),
-    ]);
+  const [t, intelligence, lineups, relatedNews, articles, headToHead] = await Promise.all([
+    getTranslations("eventPage"),
+    getMatchIntelligence(event.id, locale as AppLocale),
+    eventRepository.getLineups(event.id),
+    newsRepository.listBySport(sport, 20, locale as AppLocale),
+    articleRepository.listAll(locale as AppLocale),
+    eventRepository.getHeadToHead(event.home.team.id, event.away.team.id, event.id),
+  ]);
 
   const homeLineup = lineups.find((l) => l.teamId === event.home.team.id);
   const awayLineup = lineups.find((l) => l.teamId === event.away.team.id);
-  const injuries = [...homeInjuries, ...awayInjuries];
 
   const matchNews = relatedNews
     .filter(
@@ -173,26 +168,8 @@ export default async function EventPage({ params }: Props) {
         )}
       </Card>
 
-      {injuries.length > 0 && (
-        <Card className="p-5">
-          <h3 className="mb-3 text-base font-semibold text-white">{t("injuryReport")}</h3>
-          <ul className="space-y-2">
-            {injuries.map((injury) => (
-              <li key={injury.id} className="text-sm text-[var(--muted)]">
-                <span className="font-medium text-slate-200">
-                  {injury.impact === "high" ? "⚠️ " : ""}
-                </span>
-                {injury.description}
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
-
-      {intelligence.insights.length > 0 && <IntelligencePanel insights={intelligence.insights} />}
-
       {intelligence.prediction && (
-        <PredictionBlock
+        <PredictionGenerator
           prediction={intelligence.prediction}
           homeTeamName={event.home.team.name}
           awayTeamName={event.away.team.name}
