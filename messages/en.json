@@ -220,6 +220,7 @@
   },
   "footer": {
     "tagline": "A demo version of the platform (V1). Match, news and prediction data is mock data.",
+    "disclaimer": "SportNow content is provided for informational purposes only and does not constitute a public offer. Predictions and analysis are generated algorithmically from publicly available data, do not guarantee any match outcome, and should not be treated as financial advice. SportNow is not a bookmaker and does not accept sports bets. This site is intended for users aged 18 and over; if you bet with third-party bookmakers, please gamble responsibly and be aware of the risks involved. Team, league and tournament names, along with associated trademarks, belong to their respective owners and are used for informational purposes only.",
     "rights": "All rights reserved."
   },
   "favoritesPage": {

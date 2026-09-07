@@ -29,8 +29,13 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 border-t border-[rgba(var(--ink-rgb),0.1)] pt-6 text-xs text-[var(--muted)]">
-          © {new Date().getFullYear()} {t("meta.siteName")}. {t("footer.rights")}
+        <div className="mt-8 border-t border-[rgba(var(--ink-rgb),0.1)] pt-6">
+          <p className="max-w-3xl text-xs leading-relaxed text-[var(--muted)] opacity-80">
+            {t("footer.disclaimer")}
+          </p>
+          <p className="mt-4 text-xs text-[var(--muted)]">
+            © {new Date().getFullYear()} {t("meta.siteName")}. {t("footer.rights")}
+          </p>
         </div>
       </div>
     </footer>
