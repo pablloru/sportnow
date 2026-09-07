@@ -85,7 +85,7 @@ export default async function LocaleLayout({
           suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){try{var t=localStorage.getItem('sportsnew:theme');" +
+              "(function(){try{var t=localStorage.getItem('sportnow:theme');" +
               "if(t!=='light'&&t!=='dark'){t='dark'}" +
               "document.documentElement.setAttribute('data-theme',t);}catch(e){}})();",
           }}

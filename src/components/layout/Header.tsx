@@ -26,7 +26,7 @@ export function Header() {
             className="h-8 w-8 shrink-0 rounded-lg"
           />
           <span className="font-display text-base font-semibold uppercase tracking-wide sm:text-lg">
-            Sports<span className="text-[var(--brand)]">New</span>
+            Sport<span className="text-[var(--brand)]">Now</span>
           </span>
         </Link>
 

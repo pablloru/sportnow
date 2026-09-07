@@ -15,12 +15,12 @@
 export type FavoriteKind = "team" | "event";
 
 const STORAGE_KEYS: Record<FavoriteKind, string> = {
-  team: "sportsnew:favorite-teams",
-  event: "sportsnew:favorite-events",
+  team: "sportnow:favorite-teams",
+  event: "sportnow:favorite-events",
 };
 
-const CHANGE_EVENT = "sportsnew:favorites-change";
-const TOAST_EVENT = "sportsnew:favorite-toast";
+const CHANGE_EVENT = "sportnow:favorites-change";
+const TOAST_EVENT = "sportnow:favorite-toast";
 
 const EMPTY: string[] = [];
 

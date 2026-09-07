@@ -12,8 +12,8 @@
  */
 export type Theme = "dark" | "light";
 
-const STORAGE_KEY = "sportsnew:theme";
-const CHANGE_EVENT = "sportsnew:theme-change";
+const STORAGE_KEY = "sportnow:theme";
+const CHANGE_EVENT = "sportnow:theme-change";
 
 function isTheme(value: string | null): value is Theme {
   return value === "dark" || value === "light";
