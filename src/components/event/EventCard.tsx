@@ -61,7 +61,7 @@ export function EventCard({ event, compact = false }: { event: SportEvent; compa
         )}
 
         {!compact && (
-          <div className="flex items-center justify-between border-t border-white/10 pt-3 text-xs text-[var(--muted)]">
+          <div className="flex items-center justify-between border-t border-[rgba(var(--ink-rgb),0.1)] pt-3 text-xs text-[var(--muted)]">
             <LocalDateTime iso={event.startTime} locale={locale} mode="eventDateTime" />
             <div className="flex gap-1.5">
               {event.hasPrediction && <Badge tone="brand">{tSport("predictions")}</Badge>}
@@ -88,7 +88,7 @@ function TeamRow({
   const sideColor = side === "home" ? "var(--accent)" : "var(--accent-2)";
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="flex min-w-0 items-center gap-2 truncate text-sm font-medium text-white">
+      <span className="flex min-w-0 items-center gap-2 truncate text-sm font-medium text-[var(--foreground)]">
         <span
           className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
           style={{ backgroundColor: `color-mix(in srgb, ${sideColor} 20%, transparent)`, color: sideColor }}
@@ -98,7 +98,7 @@ function TeamRow({
         <span className="truncate">{name}</span>
       </span>
       {score !== undefined && (
-        <span className="font-display text-lg font-bold text-white">{score}</span>
+        <span className="font-display text-lg font-bold text-[var(--foreground)]">{score}</span>
       )}
     </div>
   );

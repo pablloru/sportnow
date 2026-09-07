@@ -123,9 +123,9 @@ function PillLabel({
 
 function TimeBox({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex min-w-[3.25rem] flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 px-2 py-2.5 sm:min-w-[4rem] sm:px-3">
+    <div className="flex min-w-[3.25rem] flex-col items-center gap-1 rounded-xl border border-[rgba(var(--ink-rgb),0.1)] bg-[rgba(var(--ink-rgb),0.05)] px-2 py-2.5 sm:min-w-[4rem] sm:px-3">
       <span
-        className="font-mono text-xl font-bold tabular-nums text-white sm:text-2xl"
+        className="font-mono text-xl font-bold tabular-nums text-[var(--foreground)] sm:text-2xl"
         suppressHydrationWarning
       >
         {String(value).padStart(2, "0")}

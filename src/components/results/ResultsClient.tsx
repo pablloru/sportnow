@@ -130,7 +130,7 @@ export function ResultsClient({
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-10 sm:px-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold uppercase tracking-wide text-white sm:text-3xl">
+        <h1 className="font-display text-2xl font-semibold uppercase tracking-wide text-[var(--foreground)] sm:text-3xl">
           {t("title")}
         </h1>
         <p className="mt-2 text-sm text-[var(--muted)]">{t("subtitle")}</p>
@@ -154,7 +154,7 @@ export function ResultsClient({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("searchPlaceholder")}
-            className="w-full rounded-2xl border border-white/10 bg-[var(--surface)] py-3 pl-11 pr-4 text-sm text-white placeholder-[var(--muted)] outline-none focus:border-white/30"
+            className="w-full rounded-2xl border border-[rgba(var(--ink-rgb),0.1)] bg-[var(--surface)] py-3 pl-11 pr-4 text-sm text-[var(--foreground)] placeholder-[var(--muted)] outline-none focus:border-[rgba(var(--ink-rgb),0.3)]"
           />
         </div>
 
@@ -173,7 +173,7 @@ export function ResultsClient({
           <select
             value={competition}
             onChange={(e) => setCompetition(e.target.value)}
-            className="rounded-xl border border-white/10 bg-[var(--surface)] px-3 py-2 text-sm text-white outline-none focus:border-white/30"
+            className="rounded-xl border border-[rgba(var(--ink-rgb),0.1)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[rgba(var(--ink-rgb),0.3)]"
           >
             <option value="all">{t("allCompetitions")}</option>
             {competitions.map((c) => (
@@ -186,7 +186,7 @@ export function ResultsClient({
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value as Period)}
-            className="rounded-xl border border-white/10 bg-[var(--surface)] px-3 py-2 text-sm text-white outline-none focus:border-white/30"
+            className="rounded-xl border border-[rgba(var(--ink-rgb),0.1)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[rgba(var(--ink-rgb),0.3)]"
             aria-label={t("period")}
           >
             {PERIODS.map((p) => (
@@ -199,7 +199,7 @@ export function ResultsClient({
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-            className="rounded-xl border border-white/10 bg-[var(--surface)] px-3 py-2 text-sm text-white outline-none focus:border-white/30"
+            className="rounded-xl border border-[rgba(var(--ink-rgb),0.1)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--foreground)] outline-none focus:border-[rgba(var(--ink-rgb),0.3)]"
           >
             <option value="newest">{t("sortNewest")}</option>
             <option value="oldest">{t("sortOldest")}</option>
@@ -209,7 +209,7 @@ export function ResultsClient({
             <button
               type="button"
               onClick={resetFilters}
-              className="ml-auto text-sm font-medium text-[var(--muted)] transition-colors hover:text-white"
+              className="ml-auto text-sm font-medium text-[var(--muted)] transition-colors hover:text-[var(--foreground)]"
             >
               {t("resetFilters")}
             </button>
@@ -226,7 +226,7 @@ export function ResultsClient({
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-dashed border-white/10 p-8 text-center text-sm text-[var(--muted)]">
+        <div className="rounded-2xl border border-dashed border-[rgba(var(--ink-rgb),0.1)] p-8 text-center text-sm text-[var(--muted)]">
           {trimmedQuery || hasActiveFilters ? t("noResults") : tCommon("emptyState")}
         </div>
       )}
@@ -236,7 +236,7 @@ export function ResultsClient({
           <button
             type="button"
             onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
-            className="rounded-full bg-white/5 px-6 py-2.5 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
+            className="rounded-full bg-[rgba(var(--ink-rgb),0.05)] px-6 py-2.5 text-sm font-medium text-[var(--foreground-soft)] transition-colors hover:bg-[rgba(var(--ink-rgb),0.1)] hover:text-[var(--foreground)]"
           >
             {t("showMore")}
           </button>
@@ -262,8 +262,8 @@ function SportPill({
       className={clsx(
         "shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors",
         active
-          ? "bg-white text-slate-950"
-          : "bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
+          ? "bg-[var(--foreground)] text-[var(--background)]"
+          : "bg-[rgba(var(--ink-rgb),0.05)] text-[var(--foreground-dim)] hover:bg-[rgba(var(--ink-rgb),0.1)] hover:text-[var(--foreground)]"
       )}
     >
       {children}

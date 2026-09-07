@@ -18,7 +18,7 @@ export function SportCategoryGrid({ sports }: { sports: Sport[] }) {
             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(var(--brand-rgb),0.12)] text-[var(--brand)] transition-colors group-hover:bg-[var(--brand)] group-hover:text-[var(--brand-ink)]">
               <SportIcon sport={sport.slug} className="h-6 w-6" />
             </span>
-            <span className="text-sm font-medium text-white">{t(`${sport.slug}.shortName`)}</span>
+            <span className="text-sm font-medium text-[var(--foreground)]">{t(`${sport.slug}.shortName`)}</span>
           </Card>
         </Link>
       ))}

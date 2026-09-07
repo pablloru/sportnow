@@ -97,7 +97,7 @@ export default async function ArticlePage({ params }: Props) {
           <Badge>{tSports(`${article.sport}.shortName`)}</Badge>
           <Badge tone="warning">{t("demoLabel")}</Badge>
         </div>
-        <h1 className="text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">
+        <h1 className="text-3xl font-bold leading-tight tracking-tight text-[var(--foreground)] sm:text-4xl">
           {article.title}
         </h1>
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[var(--muted)]">
@@ -114,12 +114,12 @@ export default async function ArticlePage({ params }: Props) {
       </header>
 
       {article.image && (
-        <div className="relative h-64 w-full overflow-hidden rounded-2xl bg-white/5 sm:h-96">
+        <div className="relative h-64 w-full overflow-hidden rounded-2xl bg-[rgba(var(--ink-rgb),0.05)] sm:h-96">
           <Image src={article.image} alt={article.title} fill priority className="object-cover" />
         </div>
       )}
 
-      <p className="text-lg font-medium leading-relaxed text-slate-200">{article.intro}</p>
+      <p className="text-lg font-medium leading-relaxed text-[var(--foreground-soft)]">{article.intro}</p>
 
       <div className="space-y-4">
         {article.body.map((paragraph, i) => (
@@ -133,7 +133,7 @@ export default async function ArticlePage({ params }: Props) {
         <Card className="grid grid-cols-2 gap-4 p-5 sm:grid-cols-4">
           {article.stats.map((stat) => (
             <div key={stat.label}>
-              <div className="text-lg font-bold text-white">{stat.value}</div>
+              <div className="text-lg font-bold text-[var(--foreground)]">{stat.value}</div>
               <div className="text-xs text-[var(--muted)]">{stat.label}</div>
             </div>
           ))}

@@ -41,8 +41,8 @@ export function PredictionMarkets({
   const t = useTranslations("eventPage");
 
   return (
-    <div className="mt-5 border-t border-white/10 pt-4">
-      <h4 className="mb-3 text-sm font-medium text-white">{t("markets.title")}</h4>
+    <div className="mt-5 border-t border-[rgba(var(--ink-rgb),0.1)] pt-4">
+      <h4 className="mb-3 text-sm font-medium text-[var(--foreground)]">{t("markets.title")}</h4>
       <div className="space-y-4">
         {markets.map((market) => (
           <MarketRow
@@ -101,7 +101,7 @@ function MarketRow({
   return (
     <div>
       <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-[var(--muted)]">{title}</p>
-      <div className="flex h-2 w-full overflow-hidden rounded-full bg-white/5">
+      <div className="flex h-2 w-full overflow-hidden rounded-full bg-[rgba(var(--ink-rgb),0.05)]">
         {market.outcomes.map((outcome) => (
           <div
             key={outcome.kind}
@@ -114,7 +114,7 @@ function MarketRow({
         {market.outcomes.map((outcome) => (
           <div key={outcome.kind} className={outcome.kind === "handicapUnderdog" || outcome.kind === "under" || outcome.kind === "no" || outcome.kind === "methodDecision" ? "text-right" : ""}>
             <span className="truncate">{outcomeLabel(outcome)}</span>{" "}
-            <span className="font-semibold text-white">{outcome.pct}%</span>
+            <span className="font-semibold text-[var(--foreground)]">{outcome.pct}%</span>
           </div>
         ))}
       </div>

@@ -11,7 +11,9 @@
     "news": "Новости",
     "predictions": "Прогнозы",
     "search": "Поиск",
-    "favorites": "Избранное"
+    "favorites": "Избранное",
+    "switchToLight": "Включить светлую тему",
+    "switchToDark": "Включить тёмную тему"
   },
   "common": {
     "readMore": "Читать далее",

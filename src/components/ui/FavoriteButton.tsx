@@ -44,7 +44,7 @@ export function FavoriteButton({ kind, id, label, addLabel, removeLabel, addText
         size === "compact" ? "h-8 px-2.5 text-xs" : "h-10 px-3.5 text-sm",
         active
           ? "border-[var(--brand)] bg-[rgba(var(--brand-rgb),0.16)] text-[var(--brand)]"
-          : "border-white/10 bg-white/5 text-slate-300 hover:border-white/20 hover:text-white"
+          : "border-[rgba(var(--ink-rgb),0.1)] bg-[rgba(var(--ink-rgb),0.05)] text-[var(--foreground-dim)] hover:border-[rgba(var(--ink-rgb),0.2)] hover:text-[var(--foreground)]"
       )}
     >
       <StarIcon filled={active} className={size === "compact" ? "h-3.5 w-3.5" : "h-4 w-4"} />

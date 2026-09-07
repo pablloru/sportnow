@@ -13,7 +13,7 @@ export function ArticleCard({ article }: { article: Article }) {
     <Link href={`/article/${article.slug}`}>
       <Card hoverable className="flex h-full flex-col overflow-hidden">
         {article.image && (
-          <div className="relative h-40 w-full overflow-hidden bg-white/5">
+          <div className="relative h-40 w-full overflow-hidden bg-[rgba(var(--ink-rgb),0.05)]">
             <Image
               src={article.image}
               alt={article.title}
@@ -27,7 +27,7 @@ export function ArticleCard({ article }: { article: Article }) {
           <span className="text-xs font-medium uppercase tracking-wide text-[var(--brand)]">
             {article.category} · {t(`${article.sport}.shortName`)}
           </span>
-          <h3 className="line-clamp-2 text-base font-semibold leading-snug text-white">
+          <h3 className="line-clamp-2 text-base font-semibold leading-snug text-[var(--foreground)]">
             {article.title}
           </h3>
           <p className="line-clamp-2 flex-1 text-sm text-[var(--muted)]">{article.excerpt}</p>

@@ -25,7 +25,7 @@ export function FavoritesNavLink() {
       href="/favorites"
       aria-label={t("favorites")}
       title={t("favorites")}
-      className="relative flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-white/5 px-3 text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
+      className="relative flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[rgba(var(--ink-rgb),0.05)] px-3 text-[var(--foreground-dim)] transition-colors hover:bg-[rgba(var(--ink-rgb),0.1)] hover:text-[var(--foreground)]"
     >
       <StarIcon />
       <span className="hidden text-sm font-medium sm:inline">{t("favorites")}</span>

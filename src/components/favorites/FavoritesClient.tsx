@@ -26,7 +26,7 @@ export function FavoritesClient({ teams, events }: { teams: Team[]; events: Spor
   return (
     <div className="mx-auto max-w-7xl space-y-10 px-4 py-10 sm:px-6">
       <div>
-        <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-white sm:text-3xl">
+        <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-[var(--foreground)] sm:text-3xl">
           {t("title")}
         </h1>
         <p className="mt-2 text-sm text-[var(--muted)]">{t("intro")}</p>
@@ -55,11 +55,11 @@ export function FavoritesClient({ teams, events }: { teams: Team[]; events: Spor
 
 function EmptyState({ message, cta }: { message: string; cta: string }) {
   return (
-    <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-white/15 bg-white/[0.02] p-5 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-[rgba(var(--ink-rgb),0.15)] bg-[rgba(var(--ink-rgb),0.02)] p-5 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-sm text-[var(--muted)]">{message}</p>
       <Link
         href="/search"
-        className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-200 transition-colors hover:border-[rgba(var(--brand-rgb),0.4)] hover:bg-[rgba(var(--brand-rgb),0.12)] hover:text-white"
+        className="flex shrink-0 items-center gap-1.5 rounded-full border border-[rgba(var(--ink-rgb),0.1)] bg-[rgba(var(--ink-rgb),0.05)] px-4 py-2 text-xs font-medium text-[var(--foreground-soft)] transition-colors hover:border-[rgba(var(--brand-rgb),0.4)] hover:bg-[rgba(var(--brand-rgb),0.12)] hover:text-[var(--foreground)]"
       >
         {cta} →
       </Link>

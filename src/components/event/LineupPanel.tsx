@@ -18,7 +18,7 @@ export function LineupPanel({
 
   return (
     <Card className="p-5">
-      <h3 className="mb-4 text-base font-semibold text-white">{t("lineups")}</h3>
+      <h3 className="mb-4 text-base font-semibold text-[var(--foreground)]">{t("lineups")}</h3>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <TeamLineup name={homeName} lineup={homeLineup} t={t} />
         <TeamLineup name={awayName} lineup={awayLineup} t={t} />
@@ -40,7 +40,7 @@ function TeamLineup({
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-sm font-semibold text-white">{name}</span>
+        <span className="text-sm font-semibold text-[var(--foreground)]">{name}</span>
         {lineup.formation && (
           <span className="text-xs text-[var(--muted)]">{lineup.formation}</span>
         )}
@@ -48,7 +48,7 @@ function TeamLineup({
       <p className="mb-1 text-xs uppercase tracking-wide text-[var(--muted)]">{t("starters")}</p>
       <ul className="mb-3 space-y-1">
         {lineup.starters.map((p) => (
-          <li key={p.id} className="flex items-center gap-2 text-sm text-slate-200">
+          <li key={p.id} className="flex items-center gap-2 text-sm text-[var(--foreground-soft)]">
             <span className="w-6 shrink-0 text-right text-xs text-[var(--muted)]">{p.number}</span>
             {p.name}
           </li>

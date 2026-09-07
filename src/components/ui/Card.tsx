@@ -13,8 +13,8 @@ export function Card({
   return (
     <div
       className={clsx(
-        "rounded-2xl border border-white/10 bg-[var(--surface)]",
-        hoverable && "transition-colors hover:border-white/20 hover:bg-[var(--surface-2)]",
+        "rounded-2xl border border-[rgba(var(--ink-rgb),0.1)] bg-[var(--surface)]",
+        hoverable && "transition-colors hover:border-[rgba(var(--ink-rgb),0.2)] hover:bg-[var(--surface-2)]",
         className
       )}
     >

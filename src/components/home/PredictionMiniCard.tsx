@@ -18,19 +18,19 @@ export function PredictionMiniCard({
         <span className="truncate text-xs font-medium text-[var(--muted)]">
           {event.home.team.shortName} — {event.away.team.shortName}
         </span>
-        <div className="flex h-2 w-full overflow-hidden rounded-full bg-white/5">
+        <div className="flex h-2 w-full overflow-hidden rounded-full bg-[rgba(var(--ink-rgb),0.05)]">
           <div className="h-full bg-[var(--accent)]" style={{ width: `${prediction.homeWinPct}%` }} />
           {prediction.drawPct !== undefined && (
-            <div className="h-full bg-white/25" style={{ width: `${prediction.drawPct}%` }} />
+            <div className="h-full bg-[rgba(var(--ink-rgb),0.25)]" style={{ width: `${prediction.drawPct}%` }} />
           )}
           <div className="h-full bg-[var(--accent-2)]" style={{ width: `${prediction.awayWinPct}%` }} />
         </div>
         <div className="flex justify-between text-xs text-[var(--muted)]">
           <span>
-            {t("homeWin")} <span className="font-semibold text-white">{prediction.homeWinPct}%</span>
+            {t("homeWin")} <span className="font-semibold text-[var(--foreground)]">{prediction.homeWinPct}%</span>
           </span>
           <span>
-            {t("awayWin")} <span className="font-semibold text-white">{prediction.awayWinPct}%</span>
+            {t("awayWin")} <span className="font-semibold text-[var(--foreground)]">{prediction.awayWinPct}%</span>
           </span>
         </div>
       </Card>

@@ -42,7 +42,7 @@ export default async function HomePage({
     <>
       <QuickNav />
       <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6">
-      <section className="bg-dot-grid relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-8 sm:p-12">
+      <section className="bg-dot-grid relative overflow-hidden rounded-3xl border border-[rgba(var(--ink-rgb),0.1)] bg-gradient-to-br from-[var(--surface-2)] via-[var(--surface)] to-[var(--surface-2)] p-8 sm:p-12">
         <div
           className="pointer-events-none absolute -right-28 -top-28 h-80 w-80 rounded-full bg-[var(--brand)]/25 blur-3xl"
           aria-hidden
@@ -56,7 +56,7 @@ export default async function HomePage({
             <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand)]" />
             {tSports("football.shortName")} · {tSports("hockey.shortName")} · {tSports("tennis.shortName")} · +4
           </span>
-          <h1 className="font-display text-4xl font-bold uppercase leading-[1.05] tracking-tight text-white sm:text-5xl">
+          <h1 className="font-display text-4xl font-bold uppercase leading-[1.05] tracking-tight text-[var(--foreground)] sm:text-5xl">
             {t("heroTitle")}
           </h1>
           <p className="mt-4 text-base text-[var(--muted)] sm:text-lg">{t("heroSubtitle")}</p>

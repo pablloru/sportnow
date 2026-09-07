@@ -36,7 +36,7 @@ export function TodayInsights({
                 {tImportance(insight.importance)}
               </Badge>
             </div>
-            <p className="text-sm font-semibold text-white">{insight.headline}</p>
+            <p className="text-sm font-semibold text-[var(--foreground)]">{insight.headline}</p>
             <p className="line-clamp-3 text-xs text-[var(--muted)]">{insight.explanation}</p>
           </Card>
         </Link>

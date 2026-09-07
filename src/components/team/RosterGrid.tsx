@@ -20,7 +20,7 @@ export function RosterGrid({ players, sport }: { players: Player[]; sport: strin
               {player.number ?? "—"}
             </span>
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-white">{player.name}</p>
+              <p className="truncate text-sm font-medium text-[var(--foreground)]">{player.name}</p>
               <div className="flex items-center gap-1.5">
                 {player.position && (
                   <span className="text-xs text-[var(--muted)]">{player.position}</span>

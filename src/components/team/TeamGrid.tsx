@@ -15,10 +15,10 @@ export function TeamGrid({ teams }: { teams: Team[] }) {
         <Link key={team.id} href={`/${team.sport}/team/${team.slug}`}>
           <Card hoverable className="flex flex-col gap-2 p-4">
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-[11px] font-semibold text-slate-200">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(var(--ink-rgb),0.1)] text-[11px] font-semibold text-[var(--foreground-soft)]">
                 {team.shortName.slice(0, 3)}
               </span>
-              <span className="truncate text-sm font-medium text-white">{team.name}</span>
+              <span className="truncate text-sm font-medium text-[var(--foreground)]">{team.name}</span>
             </div>
             {team.form && team.form.length > 0 && <FormStrip form={team.form} />}
           </Card>

@@ -121,7 +121,7 @@ export default async function EventPage({ params }: Props) {
       <Card className="p-6">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-sm text-[var(--muted)]">
           <span>
-            {t("tournament")}: <span className="text-white">{event.competition.name}</span>
+            {t("tournament")}: <span className="text-[var(--foreground)]">{event.competition.name}</span>
           </span>
           <div className="flex items-center gap-2">
             <StatusPill status={event.status} />
@@ -138,7 +138,7 @@ export default async function EventPage({ params }: Props) {
             t={t}
           />
           <div className="text-center text-sm text-[var(--muted)]">
-            <div className="text-lg font-semibold text-white">
+            <div className="text-lg font-semibold text-[var(--foreground)]">
               <LocalDateTime iso={event.startTime} locale={locale} mode="date" />
             </div>
             <div>
@@ -156,13 +156,13 @@ export default async function EventPage({ params }: Props) {
         </div>
 
         {event.status === "scheduled" && (
-          <div className="mt-5 flex justify-center border-t border-white/10 pt-5">
+          <div className="mt-5 flex justify-center border-t border-[rgba(var(--ink-rgb),0.1)] pt-5">
             <Countdown startTime={event.startTime} variant="boxes" />
           </div>
         )}
 
         {event.venue && (
-          <div className="mt-4 border-t border-white/10 pt-3 text-center text-xs text-[var(--muted)]">
+          <div className="mt-4 border-t border-[rgba(var(--ink-rgb),0.1)] pt-3 text-center text-xs text-[var(--muted)]">
             {t("venue")}: {event.venue}
           </div>
         )}
@@ -236,11 +236,11 @@ function TeamBlock({
     <div className={align === "right" ? "text-right" : "text-left"}>
       <Link
         href={href}
-        className="text-lg font-semibold text-white transition-colors hover:text-[var(--accent)] sm:text-xl"
+        className="text-lg font-semibold text-[var(--foreground)] transition-colors hover:text-[var(--accent)] sm:text-xl"
       >
         {name}
       </Link>
-      {score !== undefined && <div className="mt-1 text-3xl font-bold text-white">{score}</div>}
+      {score !== undefined && <div className="mt-1 text-3xl font-bold text-[var(--foreground)]">{score}</div>}
       <div className={`mt-2 flex items-center gap-2 ${align === "right" ? "justify-end" : ""}`}>
         <span className="text-xs text-[var(--muted)]">{t("form")}:</span>
         <FormStrip form={form} />

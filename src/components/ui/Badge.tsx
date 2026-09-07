@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 type BadgeTone = "neutral" | "accent" | "brand" | "positive" | "warning" | "danger";
 
 const TONE_CLASSES: Record<BadgeTone, string> = {
-  neutral: "bg-white/5 text-slate-300 ring-1 ring-inset ring-white/10",
+  neutral: "bg-[rgba(var(--ink-rgb),0.05)] text-[var(--foreground-dim)] ring-1 ring-inset ring-[rgba(var(--ink-rgb),0.1)]",
   accent: "bg-cyan-400/10 text-cyan-300 ring-1 ring-inset ring-cyan-400/30",
   // Site-wide energy tone (predictions, live-ish markers) — kept apart
   // from "accent" so cyan/violet stay reserved for home/away identity.

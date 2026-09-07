@@ -22,7 +22,7 @@ export async function QuickNav() {
   ];
 
   return (
-    <div className="sticky top-[115px] z-30 border-b border-white/10 bg-[var(--background)]/90 backdrop-blur">
+    <div className="sticky top-[115px] z-30 border-b border-[rgba(var(--ink-rgb),0.1)] bg-[var(--background)]/90 backdrop-blur">
       <nav
         aria-label={t("quickNavLabel")}
         className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6"
@@ -35,7 +35,7 @@ export async function QuickNav() {
             <a
               key={item.href}
               href={item.href}
-              className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:border-[rgba(var(--brand-rgb),0.4)] hover:bg-[rgba(var(--brand-rgb),0.12)] hover:text-white"
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-[rgba(var(--ink-rgb),0.1)] bg-[rgba(var(--ink-rgb),0.05)] px-3.5 py-1.5 text-xs font-medium text-[var(--foreground-soft)] transition-colors hover:border-[rgba(var(--brand-rgb),0.4)] hover:bg-[rgba(var(--brand-rgb),0.12)] hover:text-[var(--foreground)]"
             >
               <span className="text-[var(--brand)]">{item.icon}</span>
               {item.label}
@@ -43,7 +43,7 @@ export async function QuickNav() {
           ))}
           <Link
             href="/results"
-            className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:border-[rgba(var(--brand-rgb),0.4)] hover:bg-[rgba(var(--brand-rgb),0.12)] hover:text-white"
+            className="flex shrink-0 items-center gap-1.5 rounded-full border border-[rgba(var(--ink-rgb),0.1)] bg-[rgba(var(--ink-rgb),0.05)] px-3.5 py-1.5 text-xs font-medium text-[var(--foreground-soft)] transition-colors hover:border-[rgba(var(--brand-rgb),0.4)] hover:bg-[rgba(var(--brand-rgb),0.12)] hover:text-[var(--foreground)]"
           >
             <span className="text-[var(--brand)]">
               <IconFlag />

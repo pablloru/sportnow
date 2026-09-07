@@ -29,21 +29,21 @@ export function PredictionBlock({
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[rgba(var(--brand-rgb),0.16)] text-[var(--brand)]">
             <SparkleIcon />
           </span>
-          <h3 className="text-base font-semibold text-white">{t("predictionTitle")}</h3>
+          <h3 className="text-base font-semibold text-[var(--foreground)]">{t("predictionTitle")}</h3>
         </div>
         <div className="flex items-center gap-1.5">
           {prediction.isDemo && <Badge tone="warning">Demo</Badge>}
         </div>
       </div>
 
-      <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-white/5">
+      <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-[rgba(var(--ink-rgb),0.05)]">
         <div
           className="h-full bg-[var(--accent)] transition-[width] duration-700 ease-out"
           style={{ width: `${homeWinPct}%` }}
         />
         {drawPct !== undefined && (
           <div
-            className="h-full bg-white/25 transition-[width] duration-700 ease-out"
+            className="h-full bg-[rgba(var(--ink-rgb),0.25)] transition-[width] duration-700 ease-out"
             style={{ width: `${drawPct}%` }}
           />
         )}
@@ -56,7 +56,7 @@ export function PredictionBlock({
       <div className="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
         <PctColumn label={homeTeamName} sub={t("homeWin")} value={homeWinPct} color="text-[var(--accent)]" />
         {drawPct !== undefined ? (
-          <PctColumn label={t("draw")} value={drawPct} color="text-slate-300" />
+          <PctColumn label={t("draw")} value={drawPct} color="text-[var(--foreground-dim)]" />
         ) : (
           <div />
         )}
@@ -67,18 +67,18 @@ export function PredictionBlock({
         <PredictionMarkets markets={markets} homeTeamName={homeTeamName} awayTeamName={awayTeamName} />
       )}
 
-      <div className="mt-5 border-t border-white/10 pt-4">
-        <h4 className="mb-2 text-sm font-medium text-white">{t("predictionFactorsTitle")}</h4>
+      <div className="mt-5 border-t border-[rgba(var(--ink-rgb),0.1)] pt-4">
+        <h4 className="mb-2 text-sm font-medium text-[var(--foreground)]">{t("predictionFactorsTitle")}</h4>
         <ul className="space-y-2">
           {prediction.factors.map((factor) => (
             <li key={factor.label} className="text-sm text-[var(--muted)]">
-              <span className="font-medium text-slate-200">{factor.label}.</span> {factor.detail}
+              <span className="font-medium text-[var(--foreground-soft)]">{factor.label}.</span> {factor.detail}
             </li>
           ))}
         </ul>
       </div>
 
-      <p className="mt-4 border-t border-white/10 pt-3 text-xs leading-relaxed text-[var(--muted)] opacity-60">
+      <p className="mt-4 border-t border-[rgba(var(--ink-rgb),0.1)] pt-3 text-xs leading-relaxed text-[var(--muted)] opacity-60">
         {t("predictionDisclaimer")}
       </p>
     </Card>
@@ -108,7 +108,7 @@ function PctColumn({
     <div>
       <div className={`text-lg font-bold ${color}`}>{value}%</div>
       <div className="truncate text-xs text-[var(--muted)]">{sub ?? label}</div>
-      {sub && <div className="truncate text-xs font-medium text-slate-300">{label}</div>}
+      {sub && <div className="truncate text-xs font-medium text-[var(--foreground-dim)]">{label}</div>}
     </div>
   );
 }

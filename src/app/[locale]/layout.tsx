@@ -71,7 +71,26 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className="scroll-smooth">
+    <html lang={locale} className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        {/* Sets data-theme (which globals.css keys its light-theme
+         * overrides off of) from localStorage before the page paints,
+         * so a returning visitor who chose light mode never sees a
+         * flash of dark first. Deliberately a plain inline script, not
+         * a React-rendered attribute — the server has no idea what a
+         * given visitor's browser has stored, so this can only run
+         * client-side, synchronously, ahead of everything else. See
+         * src/lib/theme.ts for the same logic used after this point. */}
+        <script
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('sportsnew:theme');" +
+              "if(t!=='light'&&t!=='dark'){t='dark'}" +
+              "document.documentElement.setAttribute('data-theme',t);}catch(e){}})();",
+          }}
+        />
+      </head>
       <body className="flex min-h-screen flex-col bg-[var(--background)] font-sans text-[var(--foreground)] antialiased">
         <NextIntlClientProvider messages={messages}>
           <Header />

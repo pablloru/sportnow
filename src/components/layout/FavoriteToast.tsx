@@ -16,6 +16,11 @@ const VISIBLE_MS = 3200;
  * click "worked" or where a favorited item went. Purely a listener:
  * it renders nothing until the first toggle happens anywhere on the
  * page, and disappears on its own a few seconds later.
+ *
+ * Deliberately NOT theme-aware — this stays a fixed dark pill in both
+ * light and dark mode (the same convention most sites use for toasts/
+ * snackbars), so its colors below are literal, not the --foreground/
+ * --ink-rgb tokens the rest of the app uses.
  */
 export function FavoriteToast() {
   const t = useTranslations("favoritesToast");

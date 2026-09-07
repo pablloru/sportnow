@@ -67,7 +67,7 @@ export function SearchClient({
   return (
     <div className="mx-auto max-w-5xl space-y-10 px-4 py-10 sm:px-6">
       <div>
-        <h1 className="font-display text-2xl font-semibold uppercase tracking-wide text-white sm:text-3xl">
+        <h1 className="font-display text-2xl font-semibold uppercase tracking-wide text-[var(--foreground)] sm:text-3xl">
           {t("title")}
         </h1>
         <div className="relative mt-5">
@@ -88,7 +88,7 @@ export function SearchClient({
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("placeholder")}
             autoFocus
-            className="w-full rounded-2xl border border-white/10 bg-[var(--surface)] py-3.5 pl-11 pr-4 text-base text-white placeholder-[var(--muted)] outline-none focus:border-white/30"
+            className="w-full rounded-2xl border border-[rgba(var(--ink-rgb),0.1)] bg-[var(--surface)] py-3.5 pl-11 pr-4 text-base text-[var(--foreground)] placeholder-[var(--muted)] outline-none focus:border-[rgba(var(--ink-rgb),0.3)]"
           />
         </div>
       </div>
@@ -109,7 +109,7 @@ export function SearchClient({
               <Link
                 key={sport.slug}
                 href={`/${sport.slug}`}
-                className="rounded-full bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
+                className="rounded-full bg-[rgba(var(--ink-rgb),0.05)] px-4 py-2 text-sm font-medium text-[var(--foreground-soft)] transition-colors hover:bg-[rgba(var(--ink-rgb),0.1)] hover:text-[var(--foreground)]"
               >
                 {tSports(`${sport.slug}.name`)}
               </Link>

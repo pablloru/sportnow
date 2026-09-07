@@ -11,7 +11,9 @@
     "news": "News",
     "predictions": "Predictions",
     "search": "Search",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "switchToLight": "Switch to light theme",
+    "switchToDark": "Switch to dark theme"
   },
   "common": {
     "readMore": "Read more",

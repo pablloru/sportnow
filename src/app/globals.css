@@ -1,12 +1,32 @@
 @import "tailwindcss";
 
+/* Dark theme is the default/base palette (:root) — the app's original
+ * look, unchanged. Light theme (:root[data-theme="light"]) overrides
+ * only the surface/text tokens below; brand and semantic status colors
+ * (brand/accent/positive/warning/danger) stay identical in both themes
+ * on purpose — they're the site's fixed identity, not part of the
+ * light/dark distinction. See src/lib/theme.ts + ThemeToggle for how
+ * `data-theme` gets set (localStorage-backed, toggled in the header). */
 :root {
   --background: #060a14;
   --surface: #0d1420;
   --surface-2: #131c2b;
   --border: #1f2937;
   --foreground: #f4f6f8;
+  /* Two steps down from --foreground, in decreasing order of contrast —
+   * replaces what used to be hardcoded text-slate-200 / text-slate-300
+   * throughout the app so those steps also flip correctly in light mode. */
+  --foreground-soft: #e2e8f0;
+  --foreground-dim: #cbd5e1;
   --muted: #93a1b5;
+
+  /* RGB triplet (no hex) for every translucent border/background tint
+   * that used to be a literal `white/NN` opacity utility — e.g.
+   * `border-white/10` became `border-[rgba(var(--ink-rgb),0.1)]`. Dark
+   * theme wants light-colored ink on a dark surface (white); light
+   * theme wants dark ink on a light surface — same trick already used
+   * for --brand-rgb below, just for "neutral ink" instead of brand. */
+  --ink-rgb: 255, 255, 255;
 
   /* Home/away team identity — used ONLY when a color needs to point at
    * a specific side (score bars, form strips, handicap outcomes). Never
@@ -27,6 +47,18 @@
   --danger: #fb7185;
 }
 
+:root[data-theme="light"] {
+  --background: #f3f5f8;
+  --surface: #ffffff;
+  --surface-2: #eef1f5;
+  --border: #e2e8f0;
+  --foreground: #0f172a;
+  --foreground-soft: #1e293b;
+  --foreground-dim: #334155;
+  --muted: #64748b;
+  --ink-rgb: 15, 23, 42;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -34,9 +66,9 @@
     Arial, sans-serif;
 }
 
-/* The page background reads as flat black without this — a faint
- * dot-grid (broadcast-graphics texture) plus a soft floodlight wash in
- * the brand color. Low opacity, and deliberately NOT
+/* The page background reads as flat without this — a faint dot-grid
+ * (broadcast-graphics texture) plus a soft floodlight wash in the
+ * brand color. Low opacity, and deliberately NOT
  * `background-attachment: fixed`: a fixed, multi-layer background
  * behind a `sticky` + `backdrop-blur` header (see Header.tsx) forces the
  * browser to resample this whole pattern on every scroll frame, which
@@ -48,10 +80,11 @@ body {
   background-image:
     radial-gradient(circle at 12% -10%, rgba(var(--brand-rgb), 0.14), transparent 45%),
     radial-gradient(circle at 100% 15%, rgba(167, 139, 250, 0.09), transparent 40%),
-    radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    radial-gradient(circle, rgba(var(--ink-rgb), 0.05) 1px, transparent 1px);
   background-size: auto, auto, 26px 26px;
   background-repeat: no-repeat, no-repeat, repeat;
   color: var(--foreground);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 ::selection {
@@ -77,7 +110,7 @@ body {
 /* Faint dot-grid texture for hero/section backgrounds — a broadcast-
  * graphics touch that reads as "sports" without competing with content. */
 .bg-dot-grid {
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(var(--ink-rgb), 0.09) 1px, transparent 1px);
   background-size: 22px 22px;
 }
 

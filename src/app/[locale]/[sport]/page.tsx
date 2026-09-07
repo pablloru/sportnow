@@ -54,7 +54,7 @@ export default async function SportPage({ params }: Props) {
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(var(--brand-rgb),0.14)] text-[var(--brand)]">
           <SportIcon sport={sport} className="h-6 w-6" />
         </span>
-        <h1 className="font-display text-3xl font-bold uppercase tracking-tight text-white">
+        <h1 className="font-display text-3xl font-bold uppercase tracking-tight text-[var(--foreground)]">
           {tSports(`${sport}.name`)}
         </h1>
       </section>
@@ -90,7 +90,7 @@ export default async function SportPage({ params }: Props) {
             data.results.length > 0 && (
               <Link
                 href={`/results?sport=${sport}`}
-                className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
+                className="text-sm font-medium text-[var(--foreground-dim)] transition-colors hover:text-[var(--foreground)]"
               >
                 {t("seeAllResults")} →
               </Link>
@@ -155,7 +155,7 @@ export default async function SportPage({ params }: Props) {
 function EmptyState() {
   const t = useTranslations("common");
   return (
-    <div className="rounded-2xl border border-dashed border-white/10 p-8 text-center text-sm text-[var(--muted)]">
+    <div className="rounded-2xl border border-dashed border-[rgba(var(--ink-rgb),0.1)] p-8 text-center text-sm text-[var(--muted)]">
       {t("emptyState")}
     </div>
   );

@@ -80,11 +80,11 @@ export default async function NewsPage({ params }: Props) {
           <Badge>{tSports(`${news.sport}.shortName`)}</Badge>
           <Badge tone="warning">{tArticle("demoLabel")}</Badge>
         </div>
-        <h1 className="text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">
+        <h1 className="text-3xl font-bold leading-tight tracking-tight text-[var(--foreground)] sm:text-4xl">
           {news.title}
         </h1>
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[var(--muted)]">
-          <span className="font-medium text-slate-300">{news.source.name}</span>
+          <span className="font-medium text-[var(--foreground-dim)]">{news.source.name}</span>
           <span>
             {tArticle("publishedOn")} <LocalDateTime iso={news.publishedAt} locale={locale} mode="date" />
           </span>
@@ -97,7 +97,7 @@ export default async function NewsPage({ params }: Props) {
       </header>
 
       {news.image && (
-        <div className="relative h-64 w-full overflow-hidden rounded-2xl bg-white/5 sm:h-96">
+        <div className="relative h-64 w-full overflow-hidden rounded-2xl bg-[rgba(var(--ink-rgb),0.05)] sm:h-96">
           <Image src={news.image} alt={news.title} fill priority className="object-cover" />
         </div>
       )}
@@ -120,7 +120,7 @@ export default async function NewsPage({ params }: Props) {
               <Link
                 key={team.id}
                 href={`/${team.sport}/team/${team.slug}`}
-                className="rounded-full bg-white/5 px-3.5 py-1.5 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
+                className="rounded-full bg-[rgba(var(--ink-rgb),0.05)] px-3.5 py-1.5 text-sm font-medium text-[var(--foreground-soft)] transition-colors hover:bg-[rgba(var(--ink-rgb),0.1)] hover:text-[var(--foreground)]"
               >
                 {team.name}
               </Link>

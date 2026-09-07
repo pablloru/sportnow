@@ -13,7 +13,7 @@ export function NewsCard({ news, sport }: { news: News; sport?: string }) {
     <Link href={`/news/${news.slug}`}>
       <Card hoverable className="flex h-full flex-col overflow-hidden">
         {news.image && (
-          <div className="relative h-36 w-full overflow-hidden bg-white/5">
+          <div className="relative h-36 w-full overflow-hidden bg-[rgba(var(--ink-rgb),0.05)]">
             <Image
               src={news.image}
               alt={news.title}
@@ -27,7 +27,7 @@ export function NewsCard({ news, sport }: { news: News; sport?: string }) {
           <span className="text-xs font-medium uppercase tracking-wide text-[var(--brand)]">
             {t(`${sport ?? news.sport}.shortName`)}
           </span>
-          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-white">{news.title}</h3>
+          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-[var(--foreground)]">{news.title}</h3>
           <p className="line-clamp-2 flex-1 text-sm text-[var(--muted)]">{news.excerpt}</p>
           <div className="flex items-center justify-between pt-1 text-xs text-[var(--muted)]">
             <span>{news.source.name}</span>

@@ -94,13 +94,13 @@ export function PredictionGenerator({
   // once something is actually happening, framing the checklist below.
   return (
     <Card className="overflow-hidden p-0">
-      <div className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
+      <div className="flex items-center gap-3 border-b border-[rgba(var(--ink-rgb),0.1)] px-5 py-4">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(var(--brand-rgb),0.16)] text-[var(--brand)]">
           <SparkleIcon />
         </span>
-        <h3 className="text-base font-semibold text-white">{t("predictionTitle")}</h3>
+        <h3 className="text-base font-semibold text-[var(--foreground)]">{t("predictionTitle")}</h3>
         <span
-          className="ml-auto h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-white/15 border-t-[var(--brand)]"
+          className="ml-auto h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-[rgba(var(--ink-rgb),0.15)] border-t-[var(--brand)]"
           aria-hidden
         />
       </div>
@@ -117,11 +117,11 @@ export function PredictionGenerator({
                 <span
                   className={clsx(
                     "h-2 w-2 shrink-0 rounded-full",
-                    isActive ? "animate-pulse bg-[var(--brand)]" : "bg-white/15"
+                    isActive ? "animate-pulse bg-[var(--brand)]" : "bg-[rgba(var(--ink-rgb),0.15)]"
                   )}
                 />
               )}
-              <span className={isDone ? "text-slate-200" : isActive ? "text-white" : "text-[var(--muted)]"}>
+              <span className={isDone ? "text-[var(--foreground-soft)]" : isActive ? "text-[var(--foreground)]" : "text-[var(--muted)]"}>
                 {t(key)}
               </span>
             </li>

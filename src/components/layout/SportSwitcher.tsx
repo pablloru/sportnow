@@ -27,7 +27,7 @@ export function SportSwitcher() {
               "flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-colors",
               active
                 ? "bg-[var(--brand)] text-[var(--brand-ink)]"
-                : "bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
+                : "bg-[rgba(var(--ink-rgb),0.05)] text-[var(--foreground-dim)] hover:bg-[rgba(var(--ink-rgb),0.1)] hover:text-[var(--foreground)]"
             )}
           >
             <SportIcon sport={sport.slug} className="h-4 w-4 shrink-0" />

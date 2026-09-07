@@ -102,7 +102,7 @@ export default async function TeamPage({ params }: Props) {
                 <SportIcon sport={sport} className="h-3.5 w-3.5" />
                 {tSports(`${sport}.shortName`)}
               </div>
-              <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-white sm:text-3xl">
+              <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-[var(--foreground)] sm:text-3xl">
                 {team.name}
               </h1>
               {team.country && <p className="text-sm text-[var(--muted)]">{team.country}</p>}
@@ -141,7 +141,7 @@ export default async function TeamPage({ params }: Props) {
             action={
               <Link
                 href={{ pathname: "/results", query: { sport, q: team.name } }}
-                className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
+                className="text-sm font-medium text-[var(--foreground-dim)] transition-colors hover:text-[var(--foreground)]"
               >
                 {t("seeAllResults")} →
               </Link>

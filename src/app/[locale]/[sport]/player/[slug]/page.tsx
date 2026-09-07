@@ -84,7 +84,7 @@ export default async function PlayerPage({ params }: Props) {
             {player.number ?? "—"}
           </span>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">{player.name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl">{player.name}</h1>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]">
               {player.position && <span>{player.position}</span>}
               <span>·</span>
@@ -97,7 +97,7 @@ export default async function PlayerPage({ params }: Props) {
         </div>
 
         {injury && (
-          <p className="mt-4 border-t border-white/10 pt-4 text-sm text-[var(--muted)]">
+          <p className="mt-4 border-t border-[rgba(var(--ink-rgb),0.1)] pt-4 text-sm text-[var(--muted)]">
             {injury.impact === "high" ? "⚠️ " : ""}
             {injury.description}
           </p>

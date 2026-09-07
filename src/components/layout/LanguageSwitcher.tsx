@@ -18,7 +18,7 @@ export function LanguageSwitcher() {
   const pathname = usePathname();
 
   return (
-    <div className="flex shrink-0 items-center gap-0.5 rounded-full bg-white/5 p-1">
+    <div className="flex shrink-0 items-center gap-0.5 rounded-full bg-[rgba(var(--ink-rgb),0.05)] p-1">
       {routing.locales.map((code) => {
         const active = code === locale;
         return (
@@ -29,7 +29,7 @@ export function LanguageSwitcher() {
             aria-current={active ? "true" : undefined}
             className={clsx(
               "rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide transition-colors",
-              active ? "bg-white text-slate-950" : "text-slate-300 hover:bg-white/10 hover:text-white"
+              active ? "bg-[var(--foreground)] text-[var(--background)]" : "text-[var(--foreground-dim)] hover:bg-[rgba(var(--ink-rgb),0.1)] hover:text-[var(--foreground)]"
             )}
           >
             {LOCALE_LABELS[code] ?? code}

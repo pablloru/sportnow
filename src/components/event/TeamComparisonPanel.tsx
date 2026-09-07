@@ -35,7 +35,7 @@ export function TeamComparisonPanel({
 
   return (
     <Card className="p-5">
-      <h3 className="mb-4 text-base font-semibold text-white">{t("title")}</h3>
+      <h3 className="mb-4 text-base font-semibold text-[var(--foreground)]">{t("title")}</h3>
 
       {hasForm && (
         <section>
@@ -67,7 +67,7 @@ export function TeamComparisonPanel({
         </section>
       )}
 
-      <section className={hasForm ? "mt-5 border-t border-white/10 pt-5" : ""}>
+      <section className={hasForm ? "mt-5 border-t border-[rgba(var(--ink-rgb),0.1)] pt-5" : ""}>
         <div className="mb-2 flex items-center justify-between gap-2">
           <p className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
             {t("headToHead")}
@@ -90,7 +90,7 @@ export function TeamComparisonPanel({
               </div>
               {h2h.draws > 0 ? (
                 <div>
-                  <div className="text-lg font-bold text-slate-300">{h2h.draws}</div>
+                  <div className="text-lg font-bold text-[var(--foreground-dim)]">{h2h.draws}</div>
                   <div className="text-xs text-[var(--muted)]">{t("draws")}</div>
                 </div>
               ) : (
@@ -109,7 +109,7 @@ export function TeamComparisonPanel({
                   className="flex items-center justify-between text-xs text-[var(--muted)]"
                 >
                   <LocalDateTime iso={event.startTime} locale={locale} mode="date" />
-                  <span className="font-medium text-slate-200">
+                  <span className="font-medium text-[var(--foreground-soft)]">
                     {event.home.team.shortName} {event.home.score}:{event.away.score}{" "}
                     {event.away.team.shortName}
                   </span>
@@ -121,18 +121,18 @@ export function TeamComparisonPanel({
       </section>
 
       {statistics.length > 0 && (
-        <section className="mt-5 border-t border-white/10 pt-5">
+        <section className="mt-5 border-t border-[rgba(var(--ink-rgb),0.1)] pt-5">
           <p className="mb-3 text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
             {t("keyStats")}
           </p>
           <div className="space-y-3">
             {statistics.map((stat) => (
               <div key={stat.id} className="flex items-center gap-3 text-sm">
-                <span className="w-12 shrink-0 text-right font-semibold text-white">
+                <span className="w-12 shrink-0 text-right font-semibold text-[var(--foreground)]">
                   {stat.homeValue}
                 </span>
                 <span className="flex-1 text-center text-xs text-[var(--muted)]">{stat.label}</span>
-                <span className="w-12 shrink-0 text-left font-semibold text-white">
+                <span className="w-12 shrink-0 text-left font-semibold text-[var(--foreground)]">
                   {stat.awayValue}
                 </span>
               </div>
