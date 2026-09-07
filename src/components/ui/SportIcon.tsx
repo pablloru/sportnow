@@ -49,11 +49,15 @@ export function SportIcon({ sport, className }: { sport: SportSlug; className?: 
     case "tennis":
       return (
         <svg {...props}>
-          <circle cx="12" cy="12" r="9" />
-          {/* felt seam: two arcs from pole to pole, bowing to opposite
-           * sides — stays well inside the circle so nothing clips */}
-          <path d="M12 3C6.5 6 6.5 18 12 21" />
-          <path d="M12 3c5.5 3 5.5 15 0 18" />
+          {/* racket: hollow angled head with a simple string cross, plus
+           * a shaft running down to the handle */}
+          <ellipse cx="8.5" cy="9.5" rx="5.2" ry="6.4" transform="rotate(-35 8.5 9.5)" />
+          <path d="M8.5 3.1v12.8M3.3 9.5h10.4" transform="rotate(-35 8.5 9.5)" />
+          <path d="M12.6 14.6 19 21" />
+          {/* ball: drawn apart from the head and filled solid, so racket
+           * and ball each read clearly at a glance instead of blurring
+           * into one shape */}
+          <circle cx="19" cy="4.7" r="2.9" fill="currentColor" stroke="none" />
         </svg>
       );
     case "cs2":
