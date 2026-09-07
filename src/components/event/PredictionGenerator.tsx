@@ -27,12 +27,12 @@ const REVEAL_DELAY_MS = 800;
 type Phase = "idle" | "generating" | "done";
 
 /**
- * Gates the match page's prediction behind an explicit "Получить
- * прогноз" click instead of showing it immediately — a visitor has to
- * ask for it, and watching each step check off in order makes the
- * eventual number feel earned rather than just another stat on the
- * page. Once the checklist finishes, hands off to the real
- * PredictionBlock with the already-known result.
+ * Gates the match page's prediction behind an explicit button click
+ * instead of showing it immediately — a visitor has to ask for it, and
+ * watching each step check off in order makes the eventual number feel
+ * earned rather than just another stat on the page. Once the checklist
+ * finishes, hands off to the real PredictionBlock with the
+ * already-known result.
  */
 export function PredictionGenerator({
   prediction,
@@ -70,6 +70,28 @@ export function PredictionGenerator({
     );
   }
 
+  // Idle: one big, unadorned button — no card chrome, no header row, no
+  // explanatory subtitle above it. It's the single most important
+  // action on the page before a prediction exists, so it gets to just
+  // be a button rather than a button buried inside a labeled card.
+  if (phase === "idle") {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          setCompleted(0);
+          setPhase("generating");
+        }}
+        className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-[var(--brand)] px-6 py-5 text-base font-semibold text-slate-950 transition-transform hover:scale-[1.01] active:scale-[0.99]"
+      >
+        <SparkleIcon className="h-5 w-5" />
+        {t("getPrediction")}
+      </button>
+    );
+  }
+
+  // Generating: the card chrome (icon + title + spinner) only appears
+  // once something is actually happening, framing the checklist below.
   return (
     <Card className="overflow-hidden p-0">
       <div className="flex items-center gap-3 border-b border-white/10 px-5 py-4">
@@ -77,54 +99,35 @@ export function PredictionGenerator({
           <SparkleIcon />
         </span>
         <h3 className="text-base font-semibold text-white">{t("predictionTitle")}</h3>
-        {phase === "generating" && (
-          <span
-            className="ml-auto h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-white/15 border-t-[var(--brand)]"
-            aria-hidden
-          />
-        )}
+        <span
+          className="ml-auto h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-white/15 border-t-[var(--brand)]"
+          aria-hidden
+        />
       </div>
 
-      {phase === "idle" ? (
-        <div className="p-5">
-          <p className="mb-4 text-sm text-[var(--muted)]">{t("predictionCtaSubtitle")}</p>
-          <button
-            type="button"
-            onClick={() => {
-              setCompleted(0);
-              setPhase("generating");
-            }}
-            className="inline-flex items-center gap-2 rounded-full bg-[var(--brand)] px-5 py-2.5 text-sm font-semibold text-slate-950 transition-transform hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <SparkleIcon className="h-4 w-4" />
-            {t("getPrediction")}
-          </button>
-        </div>
-      ) : (
-        <ul className="space-y-3 p-5">
-          {STEP_KEYS.map((key, index) => {
-            const isDone = index < completed;
-            const isActive = index === completed;
-            return (
-              <li key={key} className="flex items-center gap-2.5 text-sm">
-                {isDone ? (
-                  <CheckIcon />
-                ) : (
-                  <span
-                    className={clsx(
-                      "h-2 w-2 shrink-0 rounded-full",
-                      isActive ? "animate-pulse bg-[var(--brand)]" : "bg-white/15"
-                    )}
-                  />
-                )}
-                <span className={isDone ? "text-slate-200" : isActive ? "text-white" : "text-[var(--muted)]"}>
-                  {t(key)}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      <ul className="space-y-3 p-5">
+        {STEP_KEYS.map((key, index) => {
+          const isDone = index < completed;
+          const isActive = index === completed;
+          return (
+            <li key={key} className="flex items-center gap-2.5 text-sm">
+              {isDone ? (
+                <CheckIcon />
+              ) : (
+                <span
+                  className={clsx(
+                    "h-2 w-2 shrink-0 rounded-full",
+                    isActive ? "animate-pulse bg-[var(--brand)]" : "bg-white/15"
+                  )}
+                />
+              )}
+              <span className={isDone ? "text-slate-200" : isActive ? "text-white" : "text-[var(--muted)]"}>
+                {t(key)}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
     </Card>
   );
 }
