@@ -109,6 +109,10 @@
     "winsShort": "W",
     "drawsShort": "D",
     "lossesShort": "L",
+    "win": "Win",
+    "draw": "Draw",
+    "loss": "Loss",
+    "formHint": "The team's own last 5 matches (not against the opponent shown alongside it). Left is the earliest match, right is the most recent.",
     "keyStats": "Key stats"
   },
   "teamPage": {
