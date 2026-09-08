@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { eventRepository } from "@/lib/repositories/event.repository";
 import { routing } from "@/i18n/routing";
@@ -25,16 +26,18 @@ export async function generateMetadata({
 
 type Props = {
   params: Promise<{ locale: string }>;
-  // Reading searchParams here (rather than via the client useSearchParams
-  // hook) opts just this route into per-request rendering instead of full
-  // static generation — the simplest way to seed the results filters from
-  // a "see all" link on a sport/team page without a Suspense boundary.
-  searchParams: Promise<{ sport?: string; q?: string }>;
 };
 
-export default async function ResultsPage({ params, searchParams }: Props) {
+// `sport`/`q` used to be read here via searchParams, which forces
+// per-request rendering and rules out static export. ResultsClient now
+// reads them itself via useSearchParams() — that hook requires a
+// Suspense boundary, which is what makes this whole route static
+// again (Next resolves the boundary at build time; the search-params
+// dependent bit fills in client-side on hydration, from an
+// already-loaded, already-filtered dataset, so there's nothing
+// meaningful for the fallback to cover).
+export default async function ResultsPage({ params }: Props) {
   const { locale } = await params;
-  const { sport, q } = await searchParams;
   setRequestLocale(locale);
 
   const allEvents = await eventRepository.listAll();
@@ -42,5 +45,9 @@ export default async function ResultsPage({ params, searchParams }: Props) {
     .filter((e) => e.status === "finished")
     .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
 
-  return <ResultsClient events={finished} initialSport={sport} initialQuery={q} />;
+  return (
+    <Suspense fallback={null}>
+      <ResultsClient events={finished} />
+    </Suspense>
+  );
 }

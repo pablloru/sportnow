@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { clsx } from "clsx";
 import type { SportEvent, SportSlug } from "@/lib/types";
@@ -20,21 +21,21 @@ type SortOrder = "newest" | "oldest";
  * filterable by sport, competition, and recency, plus free-text search
  * over team/tournament names. Same "ship the (small) dataset, filter
  * client-side" approach as SearchClient — no separate history API
- * needed for a dataset this size. `initialSport`/`initialQuery` seed
- * the filters when arriving from a sport or team page's "see all"
- * link; the rest of the UI is fully interactive from there. */
-export function ResultsClient({
-  events,
-  initialSport,
-  initialQuery,
-}: {
-  events: SportEvent[];
-  initialSport?: string;
-  initialQuery?: string;
-}) {
+ * needed for a dataset this size. The `sport`/`q` query-string params
+ * seed the filters when arriving from a sport or team page's "see all"
+ * link, read client-side via useSearchParams() (rather than passed
+ * down from the server page component) so this route stays fully
+ * static — a page reading searchParams server-side can't be
+ * pre-rendered, which matters for output:"export" static hosting.
+ * The caller wraps this component in <Suspense>, which
+ * useSearchParams() requires. */
+export function ResultsClient({ events }: { events: SportEvent[] }) {
   const t = useTranslations("resultsPage");
   const tSports = useTranslations("sports");
   const tCommon = useTranslations("common");
+  const searchParams = useSearchParams();
+  const initialSport = searchParams.get("sport") ?? undefined;
+  const initialQuery = searchParams.get("q") ?? undefined;
 
   const [query, setQuery] = useState(initialQuery ?? "");
   const [sport, setSport] = useState<SportSlug | "all">(

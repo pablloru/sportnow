@@ -5,6 +5,11 @@ import { EVENTS, ARTICLES, TEAMS, PLAYERS, getTeam } from "@/lib/mock-data";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+// See robots.ts — same static-export requirement. `lastModified` below
+// is fixed at build time rather than per-request, which is exactly
+// what a static export implies anyway (a fresh timestamp per deploy).
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const entries: MetadataRoute.Sitemap = [];
