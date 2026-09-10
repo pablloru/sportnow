@@ -1,5 +1,6 @@
 import type { Team } from "@/lib/types";
 import { withUniqueSlugs } from "./helpers";
+import { REAL_TEAMS } from "@/lib/real-data/generated";
 
 // NOTE on tennis: the platform models a "match" uniformly across sports
 // as an Event between two `Team`s. For an individual sport like tennis
@@ -67,10 +68,20 @@ const RAW_TEAMS: Omit<Team, "slug">[] = [
 /** Every team name above is unique, so this never has to disambiguate —
  * but deriving slugs this way means a future new team can never
  * silently collide with an existing one either. */
-export const TEAMS: Team[] = withUniqueSlugs(RAW_TEAMS);
+export const TEAMS: Team[] = withUniqueSlugs([
+  ...RAW_TEAMS.filter((t) => t.sport !== "football" && t.sport !== "hockey"),
+  ...REAL_TEAMS,
+]);
+
+// Full, unfiltered mock roster (football/hockey included) — kept only so the
+// literal event objects below in events.ts (which still reference the
+// original fictional football/hockey team ids while being built, before
+// those sports are filtered out of the final EVENTS export) can resolve via
+// getTeam() without throwing. Never exported, never shown in any UI list.
+const MOCK_TEAMS: Team[] = withUniqueSlugs(RAW_TEAMS);
 
 export function getTeam(id: string): Team {
-  const found = TEAMS.find((t) => t.id === id);
+  const found = TEAMS.find((t) => t.id === id) ?? MOCK_TEAMS.find((t) => t.id === id);
   if (!found) throw new Error(`Unknown team id: ${id}`);
   return found;
 }

@@ -2,12 +2,13 @@ import type { SportEvent } from "@/lib/types";
 import { getTeam } from "./teams";
 import { getCompetition } from "./competitions";
 import { daysFromNow, hoursFromNow } from "./helpers";
+import { REAL_EVENTS } from "@/lib/real-data/generated";
 
 function participant(teamId: string, score?: number) {
   return { team: getTeam(teamId), score };
 }
 
-export const EVENTS: SportEvent[] = [
+const MOCK_EVENTS: SportEvent[] = [
   // ---------------------------------------------------------------- Football
   {
     id: "evt-football-1",
@@ -812,6 +813,13 @@ export const EVENTS: SportEvent[] = [
     hasIntelligence: false,
     hasPrediction: false,
   },
+];
+
+// Real football/hockey events (fetched at build time) replace their mock
+// counterparts; every other sport keeps its original mock data untouched.
+export const EVENTS: SportEvent[] = [
+  ...MOCK_EVENTS.filter((e) => e.sport !== "football" && e.sport !== "hockey"),
+  ...REAL_EVENTS,
 ];
 
 /** Every event involving this team, either side, across every status —

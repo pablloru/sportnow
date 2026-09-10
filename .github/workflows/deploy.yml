@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    # Refresh real football/hockey fixtures several times a day, even
+    # without a code push (anchored to the hour, not creation time).
+    - cron: "0 */4 * * *"
 
 jobs:
   build-and-deploy:
@@ -20,6 +24,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Fetch real football/hockey events
+        run: npm run generate:events
+        env:
+          FOOTBALL_DATA_API_TOKEN: ${{ secrets.FOOTBALL_DATA_API_TOKEN }}
 
       - name: Build static export
         run: npm run build
