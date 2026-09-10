@@ -238,7 +238,16 @@ function buildEvent(raw, teamsById, competitionsById) {
 async function main() {
   const [football, hockey] = await Promise.all([fetchFootball(), fetchHockey()]);
 
-  const allTeamsRaw = [...football.teams, ...hockey.teams];
+  // Slugs are added here, BEFORE teamsById is built, so the exact same
+  // (slugged) team objects end up both embedded inside each event's
+  // home/away.team AND in the standalone REAL_TEAMS export below — earlier
+  // this added slugs only to the REAL_TEAMS copy, leaving the team objects
+  // nested inside REAL_EVENTS without a slug and failing the build's
+  // TypeScript check (Team.slug is required).
+  const allTeamsRaw = [...football.teams, ...hockey.teams].map((t) => ({
+    ...t,
+    slug: slugify(t.name),
+  }));
   const teamsById = new Map(allTeamsRaw.map((t) => [t.id, t]));
 
   const allCompetitionsRaw = [...football.competitions, ...hockey.competitions];
@@ -251,11 +260,9 @@ async function main() {
     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
   // Teams actually referenced by at least one event (so we never ship a
-  // team page with zero fixtures on it).
+  // team page with zero fixtures on it). Slugs were already added above.
   const usedTeamIds = new Set(events.flatMap((e) => [e.home.team.id, e.away.team.id]));
-  const teams = allTeamsRaw
-    .filter((t) => usedTeamIds.has(t.id))
-    .map((t) => ({ ...t, slug: slugify(t.name) }));
+  const teams = allTeamsRaw.filter((t) => usedTeamIds.has(t.id));
 
   const usedCompetitionIds = new Set(events.map((e) => e.competition.id));
   const competitions = allCompetitionsRaw.filter((c) => usedCompetitionIds.has(c.id));
