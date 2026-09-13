@@ -3,6 +3,7 @@ import type { AppLocale } from "@/i18n/routing";
 import { daysFromNow, localize } from "./helpers";
 import { getSource } from "./sources";
 import { INTELLIGENCE_EN } from "./i18n/intelligence.en";
+import { REAL_INSIGHTS_RU, REAL_INSIGHTS_EN } from "@/lib/real-data/generated";
 
 /**
  * "What changed?" entries — the core Match Intelligence concept from
@@ -631,10 +632,13 @@ function localizeInsight(insight: IntelligenceInsight, locale: AppLocale): Intel
 }
 
 export function getInsightsForEvent(eventId: string, locale: AppLocale = "ru"): IntelligenceInsight[] {
-  return INTELLIGENCE_INSIGHTS.filter((i) => i.eventId === eventId)
-    .sort((a, b) => {
-      const order = { high: 0, medium: 1, low: 2 } as const;
-      return order[a.importance] - order[b.importance];
-    })
-    .map((i) => localizeInsight(i, locale));
+  const mockMatches = INTELLIGENCE_INSIGHTS.filter((i) => i.eventId === eventId).map((i) => localizeInsight(i, locale));
+  // Real events' insights (see scripts/fetch-real-events.mjs) are already
+  // localized per language at generation time, so they bypass localizeInsight().
+  const real = locale === "en" ? REAL_INSIGHTS_EN : REAL_INSIGHTS_RU;
+  const realMatches = real.filter((i) => i.eventId === eventId);
+  return [...mockMatches, ...realMatches].sort((a, b) => {
+    const order = { high: 0, medium: 1, low: 2 } as const;
+    return order[a.importance] - order[b.importance];
+  });
 }

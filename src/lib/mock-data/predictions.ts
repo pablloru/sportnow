@@ -2,6 +2,7 @@ import type { Prediction } from "@/lib/types";
 import type { AppLocale } from "@/i18n/routing";
 import { daysFromNow } from "./helpers";
 import { PREDICTION_DETAILS_EN } from "./i18n/predictions.en";
+import { REAL_PREDICTIONS_RU, REAL_PREDICTIONS_EN } from "@/lib/real-data/generated";
 
 /** The fixed set of factor labels used across every prediction (verified exhaustive). */
 const FACTOR_LABELS_EN: Record<string, string> = {
@@ -378,5 +379,11 @@ function localizePrediction(prediction: Prediction, locale: AppLocale): Predicti
 
 export function getPredictionForEvent(eventId: string, locale: AppLocale = "ru"): Prediction | undefined {
   const found = PREDICTIONS.find((p) => p.eventId === eventId);
-  return found ? localizePrediction(found, locale) : undefined;
+  if (found) return localizePrediction(found, locale);
+  // Real events (football-data.org / NHL) never match a hand-written mock
+  // id above — their prediction, if one was computable at build time, is
+  // looked up here instead. Already localized per language at generation
+  // time (see scripts/fetch-real-events.mjs), so no localizePrediction() call.
+  const real = locale === "en" ? REAL_PREDICTIONS_EN : REAL_PREDICTIONS_RU;
+  return real.find((p) => p.eventId === eventId);
 }

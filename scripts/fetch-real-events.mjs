@@ -6,6 +6,15 @@
 // browser. Any fetch failure is caught and logged so a missing token or
 // a flaky upstream never breaks the whole site build — the affected
 // sport just falls back to an empty real-data set for that run.
+//
+// Besides events/teams/competitions, this also derives — from the same
+// already-fetched matches, no extra API calls — a simple, transparent
+// prediction (win/draw/win % + factors) for upcoming matches and a
+// short post-match insight (final score + streak context) for finished
+// ones. This is a plain rule-based estimate (recent-form points +
+// a fixed home-advantage weight, plus head-to-head when it happens to
+// be in the fetched window), not a statistical/ML model — see
+// buildPrediction() below.
 
 import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -50,7 +59,12 @@ async function fetchFootball() {
     return { teams: [], competitions: [], events: [] };
   }
 
-  const dateFrom = isoDate(new Date(Date.now() - 7 * 86400000));
+  // 30 days back (not just 7) so there's enough finished-match history
+  // per team to compute a "last 5" form line and, when the fixture list
+  // happens to include an earlier meeting, a head-to-head factor —
+  // still exactly one API call per competition, so this costs nothing
+  // extra against the free-tier rate limit.
+  const dateFrom = isoDate(new Date(Date.now() - 30 * 86400000));
   const dateTo = isoDate(new Date(Date.now() + 14 * 86400000));
 
   for (const code of FOOTBALL_COMPETITIONS) {
@@ -210,6 +224,262 @@ async function fetchHockey() {
 }
 
 // ---------------------------------------------------------------------
+// Intelligence layer: form / head-to-head / predictions / post-match
+// insights, all derived from the raw matches already fetched above.
+// ---------------------------------------------------------------------
+
+/** Newest-first W/D/L for one team from already-fetched raw events,
+ * optionally restricted to strictly before `beforeTime` (so a
+ * prediction only ever sees matches before kickoff, and a post-match
+ * insight only sees matches before that match itself). */
+function computeForm(rawEvents, teamId, { limit = 5, beforeTime } = {}) {
+  return rawEvents
+    .filter(
+      (e) =>
+        e.status === "finished" &&
+        typeof e.homeScore === "number" &&
+        typeof e.awayScore === "number" &&
+        (e.homeTeamId === teamId || e.awayTeamId === teamId) &&
+        (!beforeTime || new Date(e.startTime).getTime() < beforeTime)
+    )
+    .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
+    .slice(0, limit)
+    .map((e) => {
+      const isHome = e.homeTeamId === teamId;
+      const gf = isHome ? e.homeScore : e.awayScore;
+      const ga = isHome ? e.awayScore : e.homeScore;
+      return gf > ga ? "W" : gf < ga ? "L" : "D";
+    });
+}
+
+function formPoints(form) {
+  return form.reduce((sum, r) => sum + (r === "W" ? 3 : r === "D" ? 1 : 0), 0);
+}
+
+function computeH2H(rawEvents, teamAId, teamBId, beforeTime) {
+  return rawEvents.filter(
+    (e) =>
+      e.status === "finished" &&
+      typeof e.homeScore === "number" &&
+      typeof e.awayScore === "number" &&
+      ((e.homeTeamId === teamAId && e.awayTeamId === teamBId) ||
+        (e.homeTeamId === teamBId && e.awayTeamId === teamAId)) &&
+      (!beforeTime || new Date(e.startTime).getTime() < beforeTime)
+  );
+}
+
+/**
+ * A deliberately simple, transparent estimate — recent-form points plus
+ * a fixed home-advantage weight, and a head-to-head factor when one is
+ * available in the fetched window. Not a statistical/ML model, and
+ * never claims to be one (see the predictionDisclaimer copy in
+ * messages/*.json). Returns null when there's too little history to
+ * say anything ({@link computeForm} finds fewer than 2 matches total
+ * between both teams) rather than fabricate a number from nothing.
+ */
+function buildPrediction(event, rawEvents) {
+  const kickoff = new Date(event.startTime).getTime();
+  const homeId = event.home.team.id;
+  const awayId = event.away.team.id;
+  const homeName = event.home.team.name;
+  const awayName = event.away.team.name;
+
+  const homeForm = computeForm(rawEvents, homeId, { beforeTime: kickoff });
+  const awayForm = computeForm(rawEvents, awayId, { beforeTime: kickoff });
+  if (homeForm.length + awayForm.length < 2) return null;
+
+  const homePts = formPoints(homeForm);
+  const awayPts = formPoints(awayForm);
+  const hasDraws = event.sport === "football";
+
+  const HOME_ADVANTAGE = 2.2;
+  const FLOOR = 1; // keeps a team with zero recent history from being a flat 0
+  const homeStrength = homePts + HOME_ADVANTAGE + FLOOR;
+  const awayStrength = awayPts + FLOOR;
+
+  let homeWinPct;
+  let drawPct;
+  let awayWinPct;
+  if (hasDraws) {
+    const drawShare = 0.22; // fixed baseline, roughly league-average draw rate
+    const remainder = 100 * (1 - drawShare);
+    const total = homeStrength + awayStrength;
+    homeWinPct = Math.round((homeStrength / total) * remainder);
+    awayWinPct = Math.round((awayStrength / total) * remainder);
+    drawPct = 100 - homeWinPct - awayWinPct;
+  } else {
+    const total = homeStrength + awayStrength;
+    homeWinPct = Math.round((homeStrength / total) * 100);
+    awayWinPct = 100 - homeWinPct;
+  }
+
+  const factorsRu = [];
+  const factorsEn = [];
+
+  if (homeForm.length > 0 || awayForm.length > 0) {
+    factorsRu.push({
+      label: "Текущая форма",
+      detail: `${homeName} набрали ${homePts} очков в последних ${homeForm.length} матчах, у ${awayName} — ${awayPts} очков в ${awayForm.length} матчах.`,
+    });
+    factorsEn.push({
+      label: "Current form",
+      detail: `${homeName} picked up ${homePts} points from their last ${homeForm.length} matches, against ${awayPts} for ${awayName} over ${awayForm.length} matches.`,
+    });
+  }
+
+  factorsRu.push({
+    label: "Домашний фактор",
+    detail: `${homeName} играют на своём поле — в оценку заложен стандартный вес фактора хозяев.`,
+  });
+  factorsEn.push({
+    label: "Home advantage",
+    detail: `${homeName} are playing at home — a standard home-advantage weighting is factored in.`,
+  });
+
+  const h2h = computeH2H(rawEvents, homeId, awayId, kickoff);
+  if (h2h.length > 0) {
+    let homeWins = 0;
+    let awayWins = 0;
+    let draws = 0;
+    for (const m of h2h) {
+      const homeIsHomeNow = m.homeTeamId === homeId;
+      const gf = homeIsHomeNow ? m.homeScore : m.awayScore;
+      const ga = homeIsHomeNow ? m.awayScore : m.homeScore;
+      if (gf > ga) homeWins++;
+      else if (gf < ga) awayWins++;
+      else draws++;
+    }
+    factorsRu.push({
+      label: "Личные встречи",
+      detail: `В последних ${h2h.length} очных матчах: ${homeWins} побед ${homeName}, ${draws} ничьих, ${awayWins} побед ${awayName}.`,
+    });
+    factorsEn.push({
+      label: "Head-to-head",
+      detail: `In their last ${h2h.length} meetings: ${homeWins} wins for ${homeName}, ${draws} draws, ${awayWins} wins for ${awayName}.`,
+    });
+  }
+
+  const generatedAt = new Date().toISOString();
+  const shared = { eventId: event.id, homeWinPct, awayWinPct, generatedAt, isDemo: false };
+  if (hasDraws) shared.drawPct = drawPct;
+
+  return {
+    ru: { ...shared, factors: factorsRu },
+    en: { ...shared, factors: factorsEn },
+  };
+}
+
+/**
+ * Post-match recap: the final score plus, when there's enough prior
+ * form on record, whether it extended a winning run or snapped a
+ * winless one. Template text, not an AI-written recap.
+ */
+function buildPostMatchInsights(event, rawEvents) {
+  const homeScore = event.home.score;
+  const awayScore = event.away.score;
+  if (typeof homeScore !== "number" || typeof awayScore !== "number") return null;
+
+  const kickoff = new Date(event.startTime).getTime();
+  const homeName = event.home.team.name;
+  const awayName = event.away.team.name;
+  const isDraw = homeScore === awayScore;
+  const winnerIsHome = homeScore > awayScore;
+  const winner = isDraw ? null : winnerIsHome ? event.home.team : event.away.team;
+  const loser = isDraw ? null : winnerIsHome ? event.away.team : event.home.team;
+  const winnerScore = winnerIsHome ? homeScore : awayScore;
+  const loserScore = winnerIsHome ? awayScore : homeScore;
+
+  const createdAt = new Date().toISOString();
+  const source = { id: "src-statcenter", name: "StatCenter" };
+  const insightsRu = [];
+  const insightsEn = [];
+
+  insightsRu.push({
+    id: `${event.id}-insight-score`,
+    eventId: event.id,
+    headline: isDraw ? "Ничья" : `Победа ${winner.name}`,
+    explanation: isDraw
+      ? `${homeName} ${homeScore}:${awayScore} ${awayName} — команды разошлись миром.`
+      : `${winner.name} обыграли ${loser.name} со счётом ${winnerScore}:${loserScore}.`,
+    importance: "medium",
+    createdAt,
+    source,
+  });
+  insightsEn.push({
+    id: `${event.id}-insight-score`,
+    eventId: event.id,
+    headline: isDraw ? "Draw" : `${winner.name} win`,
+    explanation: isDraw
+      ? `${homeName} ${homeScore}-${awayScore} ${awayName} — the sides shared the points.`
+      : `${winner.name} beat ${loser.name} ${winnerScore}-${loserScore}.`,
+    importance: "medium",
+    createdAt,
+    source,
+  });
+
+  if (!isDraw) {
+    const winnerId = winnerIsHome ? event.home.team.id : event.away.team.id;
+    const priorForm = computeForm(rawEvents, winnerId, { beforeTime: kickoff, limit: 5 });
+
+    let winStreak = 0;
+    for (const r of priorForm) {
+      if (r === "W") winStreak++;
+      else break;
+    }
+
+    if (winStreak >= 1) {
+      const total = winStreak + 1;
+      insightsRu.push({
+        id: `${event.id}-insight-streak`,
+        eventId: event.id,
+        headline: `${total}-я победа подряд`,
+        explanation: `${winner.name} выигрывают уже ${total}-й матч подряд.`,
+        importance: total >= 3 ? "high" : "low",
+        createdAt,
+        source,
+      });
+      insightsEn.push({
+        id: `${event.id}-insight-streak`,
+        eventId: event.id,
+        headline: `${total} in a row`,
+        explanation: `${winner.name} have now won ${total} matches in a row.`,
+        importance: total >= 3 ? "high" : "low",
+        createdAt,
+        source,
+      });
+    } else {
+      let winless = 0;
+      for (const r of priorForm) {
+        if (r !== "W") winless++;
+        else break;
+      }
+      if (winless >= 2) {
+        insightsRu.push({
+          id: `${event.id}-insight-streak`,
+          eventId: event.id,
+          headline: "Серия без побед прервана",
+          explanation: `${winner.name} прервали серию из ${winless} матчей без побед.`,
+          importance: "medium",
+          createdAt,
+          source,
+        });
+        insightsEn.push({
+          id: `${event.id}-insight-streak`,
+          eventId: event.id,
+          headline: "Winless run ends",
+          explanation: `${winner.name} snapped a ${winless}-match run without a win.`,
+          importance: "medium",
+          createdAt,
+          source,
+        });
+      }
+    }
+  }
+
+  return { ru: insightsRu, en: insightsEn };
+}
+
+// ---------------------------------------------------------------------
 
 function buildEvent(raw, teamsById, competitionsById) {
   const home = teamsById.get(raw.homeTeamId);
@@ -259,6 +529,34 @@ async function main() {
     .filter((e) => e !== null)
     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
+  // Predictions (scheduled events) and post-match insights (finished
+  // events), computed from the matches already fetched above — see the
+  // Intelligence layer section. Mutates hasPrediction/hasIntelligence on
+  // each event so listing cards pick up the same "AI insight available"
+  // badge the hand-written mock events use.
+  const predictionsRu = [];
+  const predictionsEn = [];
+  const insightsRu = [];
+  const insightsEn = [];
+
+  for (const event of events) {
+    if (event.status === "scheduled") {
+      const prediction = buildPrediction(event, rawEvents);
+      if (prediction) {
+        predictionsRu.push(prediction.ru);
+        predictionsEn.push(prediction.en);
+        event.hasPrediction = true;
+      }
+    } else if (event.status === "finished") {
+      const insights = buildPostMatchInsights(event, rawEvents);
+      if (insights && insights.ru.length > 0) {
+        insightsRu.push(...insights.ru);
+        insightsEn.push(...insights.en);
+        event.hasIntelligence = true;
+      }
+    }
+  }
+
   // Teams actually referenced by at least one event (so we never ship a
   // team page with zero fixtures on it). Slugs were already added above.
   const usedTeamIds = new Set(events.flatMap((e) => [e.home.team.id, e.away.team.id]));
@@ -271,17 +569,26 @@ async function main() {
     "// AUTO-GENERATED by scripts/fetch-real-events.mjs at build time — do not edit by hand.\n" +
     "// Real football + hockey fixtures/results fetched from football-data.org and the\n" +
     "// NHL's public schedule API. Falls back to empty arrays when a fetch fails or the\n" +
-    "// FOOTBALL_DATA_API_TOKEN secret is missing, so the build never breaks because of it.\n\n" +
-    'import type { SportEvent, Team, Competition } from "@/lib/types";\n\n';
+    "// FOOTBALL_DATA_API_TOKEN secret is missing, so the build never breaks because of it.\n" +
+    "//\n" +
+    "// REAL_PREDICTIONS_* / REAL_INSIGHTS_* are a plain rule-based estimate derived from\n" +
+    "// the same fetched matches (recent-form points + a fixed home-advantage weight, plus\n" +
+    "// head-to-head/streak context when available) — not a statistical or ML model.\n\n" +
+    'import type { SportEvent, Team, Competition, Prediction, IntelligenceInsight } from "@/lib/types";\n\n';
 
   const body =
     `export const REAL_EVENTS: SportEvent[] = ${JSON.stringify(events, null, 2)};\n\n` +
     `export const REAL_TEAMS: Team[] = ${JSON.stringify(teams, null, 2)};\n\n` +
-    `export const REAL_COMPETITIONS: Competition[] = ${JSON.stringify(competitions, null, 2)};\n`;
+    `export const REAL_COMPETITIONS: Competition[] = ${JSON.stringify(competitions, null, 2)};\n\n` +
+    `export const REAL_PREDICTIONS_RU: Prediction[] = ${JSON.stringify(predictionsRu, null, 2)};\n\n` +
+    `export const REAL_PREDICTIONS_EN: Prediction[] = ${JSON.stringify(predictionsEn, null, 2)};\n\n` +
+    `export const REAL_INSIGHTS_RU: IntelligenceInsight[] = ${JSON.stringify(insightsRu, null, 2)};\n\n` +
+    `export const REAL_INSIGHTS_EN: IntelligenceInsight[] = ${JSON.stringify(insightsEn, null, 2)};\n`;
 
   await writeFile(OUT_FILE, banner + body, "utf8");
   console.log(
-    `[fetch-real-events] wrote ${events.length} events, ${teams.length} teams, ${competitions.length} competitions -> ${OUT_FILE}`
+    `[fetch-real-events] wrote ${events.length} events, ${teams.length} teams, ${competitions.length} competitions, ` +
+      `${predictionsRu.length} predictions, ${insightsRu.length} insights -> ${OUT_FILE}`
   );
 }
 
