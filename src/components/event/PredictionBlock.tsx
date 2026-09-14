@@ -21,6 +21,12 @@ export function PredictionBlock({
 }) {
   const t = useTranslations("eventPage");
   const { homeWinPct, drawPct, awayWinPct } = prediction;
+  const likelyOutcome = describeLikelyOutcome(prediction, homeTeamName, awayTeamName, t);
+  // Same underlying facts as the percentage bar above, read as one
+  // paragraph instead of a bullet list — each factor is already a full
+  // sentence (see buildPrediction() in scripts/fetch-real-events.mjs and
+  // the hand-written mock predictions), so joining them reads naturally.
+  const rationale = prediction.factors.map((factor) => factor.detail).join(" ");
 
   return (
     <Card className="p-5">
@@ -67,15 +73,17 @@ export function PredictionBlock({
         <PredictionMarkets markets={markets} homeTeamName={homeTeamName} awayTeamName={awayTeamName} />
       )}
 
-      <div className="mt-5 border-t border-[rgba(var(--ink-rgb),0.1)] pt-4">
-        <h4 className="mb-2 text-sm font-medium text-[var(--foreground)]">{t("predictionFactorsTitle")}</h4>
-        <ul className="space-y-2">
-          {prediction.factors.map((factor) => (
-            <li key={factor.label} className="text-sm text-[var(--muted)]">
-              <span className="font-medium text-[var(--foreground-soft)]">{factor.label}.</span> {factor.detail}
-            </li>
-          ))}
-        </ul>
+      <div className="mt-5 space-y-3 rounded-xl bg-[rgba(var(--ink-rgb),0.04)] p-4">
+        <p className="text-sm leading-relaxed text-[var(--foreground-soft)]">
+          <span className="font-semibold text-[var(--foreground)]">{t("predictionLikelyOutcomeLabel")}</span>
+          {" — "}
+          {likelyOutcome}.
+        </p>
+        <p className="text-sm leading-relaxed text-[var(--muted)]">
+          <span className="font-semibold text-[var(--foreground)]">{t("predictionRationaleLabel")}</span>
+          {" — "}
+          {rationale}
+        </p>
       </div>
 
       <p className="mt-4 border-t border-[rgba(var(--ink-rgb),0.1)] pt-3 text-xs leading-relaxed text-[var(--muted)] opacity-60">
@@ -83,6 +91,45 @@ export function PredictionBlock({
       </p>
     </Card>
   );
+}
+
+/**
+ * Which single outcome the percentages favor, as one line of prose —
+ * "победа {team} (П1)" / "ничья (Х)" / "победа {team} (П2)" in Russian
+ * (the "(П1)/(Х)/(П2)" 1X2 shorthand only for sports with a draw market;
+ * the English copy omits it, since that notation isn't idiomatic there).
+ */
+function describeLikelyOutcome(
+  prediction: Prediction,
+  homeTeamName: string,
+  awayTeamName: string,
+  t: ReturnType<typeof useTranslations>
+): string {
+  const { homeWinPct, drawPct, awayWinPct } = prediction;
+  // The "(П1)/(Х)/(П2)" 1X2 shorthand only makes sense where a draw is
+  // an actual outcome (football here) — for a win-only sport it's just
+  // noise, so it's left off entirely rather than showing e.g. "(П1)" on
+  // a market that never had a Х to begin with.
+  const hasDrawMarket = drawPct !== undefined;
+
+  const candidates = [
+    {
+      pct: homeWinPct,
+      text: t("predictionOutcomeHome", { team: homeTeamName }),
+      code: hasDrawMarket ? t("predictionOutcomeCodeHome") : "",
+    },
+    {
+      pct: awayWinPct,
+      text: t("predictionOutcomeAway", { team: awayTeamName }),
+      code: hasDrawMarket ? t("predictionOutcomeCodeAway") : "",
+    },
+  ];
+  if (hasDrawMarket) {
+    candidates.push({ pct: drawPct, text: t("predictionOutcomeDraw"), code: t("predictionOutcomeCodeDraw") });
+  }
+
+  const best = candidates.reduce((a, b) => (b.pct > a.pct ? b : a));
+  return best.code ? `${best.text} (${best.code})` : best.text;
 }
 
 function SparkleIcon({ className = "h-4 w-4" }: { className?: string }) {

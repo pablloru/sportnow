@@ -147,79 +147,127 @@ async function fetchFootball() {
 // Hockey — NHL public API (no key needed)
 // ---------------------------------------------------------------------
 
+/** One week of raw NHL game objects starting at `date` ("YYYY-MM-DD" or
+ * the literal "now"), or [] on any failure — never throws, matching the
+ * "a flaky upstream never breaks the build" contract for this script. */
+async function fetchHockeyWeek(date) {
+  try {
+    const res = await fetch(`https://api-web.nhle.com/v1/schedule/${date}`);
+    if (!res.ok) {
+      console.warn(`[fetch-real-events] NHL ${date} -> HTTP ${res.status}`);
+      return [];
+    }
+    const data = await res.json();
+    const games = [];
+    for (const week of data.gameWeek ?? []) {
+      for (const game of week.games ?? []) games.push(game);
+    }
+    return games;
+  } catch (err) {
+    console.warn(`[fetch-real-events] NHL ${date} failed:`, err.message);
+    return [];
+  }
+}
+
+function mapNhlGame(game, teams) {
+  const mapTeam = (t) => {
+    const id = `nhl-team-${t.id}`;
+    if (!teams.has(id)) {
+      teams.set(id, {
+        id,
+        sport: "hockey",
+        name: t.commonName?.default || t.placeName?.default || t.abbrev,
+        shortName: t.abbrev,
+        country: undefined,
+      });
+    }
+    return id;
+  };
+
+  const homeId = mapTeam(game.homeTeam);
+  const awayId = mapTeam(game.awayTeam);
+
+  const stateMap = {
+    FUT: "scheduled",
+    PRE: "scheduled",
+    LIVE: "scheduled",
+    CRIT: "scheduled",
+    OFF: "finished",
+    FINAL: "finished",
+  };
+
+  return {
+    id: `nhl-event-${game.id}`,
+    sport: "hockey",
+    competitionId: "nhl-comp-1",
+    status: stateMap[game.gameState] ?? "scheduled",
+    startTime: game.startTimeUTC,
+    homeTeamId: homeId,
+    homeScore: game.homeTeam.score ?? undefined,
+    awayTeamId: awayId,
+    awayScore: game.awayTeam.score ?? undefined,
+    venue: game.venue?.default ?? undefined,
+  };
+}
+
+// NHL's schedule endpoint returns one week per call, so — same reasoning
+// as football's 30-day window above — going back this many weeks gets
+// enough finished-game history per team to compute a "last 5" form line.
+const PAST_WEEK_OFFSETS_DAYS = [-34, -27, -20, -13, -6];
+
 async function fetchHockey() {
   const teams = new Map();
-  const events = [];
   const competition = { id: "nhl-comp-1", sport: "hockey", name: "NHL", region: "NA", tier: 1 };
 
-  const datesToTry = [
-    isoDate(new Date(Date.now() - 6 * 86400000)),
-    "now",
-  ];
+  const currentWeekStarts = PAST_WEEK_OFFSETS_DAYS.map((d) => isoDate(new Date(Date.now() + d * 86400000)));
+  const dedupe = new Set();
+  const events = [];
 
-  for (const date of datesToTry) {
-    try {
-      const res = await fetch(`https://api-web.nhle.com/v1/schedule/${date}`);
-      if (!res.ok) {
-        console.warn(`[fetch-real-events] NHL ${date} -> HTTP ${res.status}`);
-        continue;
-      }
-      const data = await res.json();
-
-      for (const week of data.gameWeek ?? []) {
-        for (const game of week.games ?? []) {
-          const mapTeam = (t) => {
-            const id = `nhl-team-${t.id}`;
-            if (!teams.has(id)) {
-              teams.set(id, {
-                id,
-                sport: "hockey",
-                name: t.commonName?.default || t.placeName?.default || t.abbrev,
-                shortName: t.abbrev,
-                country: undefined,
-              });
-            }
-            return id;
-          };
-
-          const homeId = mapTeam(game.homeTeam);
-          const awayId = mapTeam(game.awayTeam);
-
-          const stateMap = {
-            FUT: "scheduled",
-            PRE: "scheduled",
-            LIVE: "scheduled",
-            CRIT: "scheduled",
-            OFF: "finished",
-            FINAL: "finished",
-          };
-
-          const eventId = `nhl-event-${game.id}`;
-          if (events.some((e) => e.id === eventId)) continue; // dedupe across the two date windows
-
-          events.push({
-            id: eventId,
-            sport: "hockey",
-            competitionId: competition.id,
-            status: stateMap[game.gameState] ?? "scheduled",
-            startTime: game.startTimeUTC,
-            homeTeamId: homeId,
-            homeScore: game.homeTeam.score ?? undefined,
-            awayTeamId: awayId,
-            awayScore: game.awayTeam.score ?? undefined,
-            venue: game.venue?.default ?? undefined,
-          });
-        }
-      }
-    } catch (err) {
-      console.warn(`[fetch-real-events] NHL ${date} failed:`, err.message);
+  for (const date of [...currentWeekStarts, "now"]) {
+    const games = await fetchHockeyWeek(date);
+    for (const game of games) {
+      const event = mapNhlGame(game, teams);
+      if (dedupe.has(event.id)) continue;
+      dedupe.add(event.id);
+      events.push(event);
     }
+  }
+
+  // Early in a new NHL season (or before it's even started), the windows
+  // above can hold zero *finished* games — nothing to compute recent
+  // form from for any team. Fall back to the same weekly windows exactly
+  // one year earlier (the tail end of the previous season) purely as
+  // extra history for the form/head-to-head math in buildPrediction() /
+  // buildPostMatchInsights() below. Those older games are kept separate
+  // (`historyEvents`) and never merged into `events` — they're not part
+  // of the current schedule and must never get their own match page.
+  let historyEvents = [];
+  const hasFinished = events.some((e) => e.status === "finished");
+  if (!hasFinished) {
+    const lastSeasonWeekStarts = PAST_WEEK_OFFSETS_DAYS.map((d) =>
+      isoDate(new Date(Date.now() + d * 86400000 - 365 * 86400000))
+    );
+    const historyDedupe = new Set();
+    for (const date of lastSeasonWeekStarts) {
+      const games = await fetchHockeyWeek(date);
+      for (const game of games) {
+        const event = mapNhlGame(game, teams);
+        if (event.status !== "finished") continue; // only results are useful as form history
+        if (historyDedupe.has(event.id)) continue;
+        historyDedupe.add(event.id);
+        historyEvents.push(event);
+      }
+    }
+    console.log(
+      `[fetch-real-events] NHL: no finished games in the current window, pulled ${historyEvents.length} from last season as form history.`
+    );
   }
 
   return {
     teams: [...teams.values()],
     competitions: events.length ? [competition] : [],
     events,
+    historyEvents,
   };
 }
 
@@ -529,6 +577,12 @@ async function main() {
     .filter((e) => e !== null)
     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
+  // Superset used only for form/head-to-head math (see buildPrediction()
+  // and buildPostMatchInsights()) — adds hockey's last-season fallback
+  // history on top of the events actually listed on the site. Never used
+  // to build `events` itself.
+  const formHistoryRawEvents = [...rawEvents, ...(hockey.historyEvents ?? [])];
+
   // Predictions (scheduled events) and post-match insights (finished
   // events), computed from the matches already fetched above — see the
   // Intelligence layer section. Mutates hasPrediction/hasIntelligence on
@@ -541,14 +595,14 @@ async function main() {
 
   for (const event of events) {
     if (event.status === "scheduled") {
-      const prediction = buildPrediction(event, rawEvents);
+      const prediction = buildPrediction(event, formHistoryRawEvents);
       if (prediction) {
         predictionsRu.push(prediction.ru);
         predictionsEn.push(prediction.en);
         event.hasPrediction = true;
       }
     } else if (event.status === "finished") {
-      const insights = buildPostMatchInsights(event, rawEvents);
+      const insights = buildPostMatchInsights(event, formHistoryRawEvents);
       if (insights && insights.ru.length > 0) {
         insightsRu.push(...insights.ru);
         insightsEn.push(...insights.en);
