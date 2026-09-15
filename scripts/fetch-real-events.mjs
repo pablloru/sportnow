@@ -11,10 +11,14 @@
 // already-fetched matches, no extra API calls — a simple, transparent
 // prediction (win/draw/win % + factors) for upcoming matches and a
 // short post-match insight (final score + streak context) for finished
-// ones. This is a plain rule-based estimate (recent-form points +
-// a fixed home-advantage weight, plus head-to-head when it happens to
-// be in the fetched window), not a statistical/ML model — see
-// buildPrediction() below.
+// ones. This is a plain rule-based estimate (recent-form points, named
+// by opponent and scoreline, + a fixed home-advantage weight, plus a
+// head-to-head factor naming the most recent meeting's score and year)
+// — not a statistical/ML model — see buildPrediction() below. Recent
+// form and head-to-head both draw on several seasons of per-team
+// history (football: season=YYYY per competition; hockey: NHL's
+// club-schedule-season per team), not just a narrow near-term window,
+// so an old meeting between two teams can still surface.
 
 import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -48,99 +52,146 @@ function isoDate(d) {
 
 const FOOTBALL_COMPETITIONS = ["PL", "CL", "BL1", "PD"];
 
+// How many completed seasons of history to pull per competition, on top
+// of the near-term window below, purely to feed buildPrediction()'s
+// recent-form / head-to-head math with real depth — two teams' most
+// recent meeting might be from a season or two back, not the last 30
+// days. Kept modest to stay well within the free tier's rate limit and
+// keep build time reasonable; if the free tier restricts access to
+// older seasons, those requests just fail gracefully like any other.
+const FOOTBALL_PAST_SEASONS = 3;
+
+function footballCurrentSeasonStartYear() {
+  const now = new Date();
+  // European club seasons start around July/August; before that we're
+  // still inside the season that started the previous calendar year.
+  return now.getUTCMonth() >= 6 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
+}
+
+const FOOTBALL_STATUS_MAP = {
+  SCHEDULED: "scheduled",
+  TIMED: "scheduled",
+  IN_PLAY: "scheduled",
+  PAUSED: "scheduled",
+  FINISHED: "finished",
+  POSTPONED: "postponed",
+  SUSPENDED: "cancelled",
+  CANCELLED: "cancelled",
+  AWARDED: "finished",
+};
+
+function mapFootballTeam(teams, t) {
+  const id = `fd-team-${t.id}`;
+  if (!teams.has(id)) {
+    teams.set(id, {
+      id,
+      sport: "football",
+      name: t.name,
+      shortName: t.tla || t.shortName || t.name.slice(0, 3).toUpperCase(),
+      country: undefined,
+    });
+  }
+  return id;
+}
+
+function mapFootballMatch(match, teams, competitions) {
+  const compId = `fd-comp-${match.competition.id}`;
+  if (!competitions.has(compId)) {
+    competitions.set(compId, {
+      id: compId,
+      sport: "football",
+      name: match.competition.name,
+      region: "EU",
+      tier: 1,
+    });
+  }
+
+  const homeId = mapFootballTeam(teams, match.homeTeam);
+  const awayId = mapFootballTeam(teams, match.awayTeam);
+
+  return {
+    id: `fd-event-${match.id}`,
+    sport: "football",
+    competitionId: compId,
+    status: FOOTBALL_STATUS_MAP[match.status] ?? "scheduled",
+    startTime: match.utcDate,
+    homeTeamId: homeId,
+    homeScore: match.score?.fullTime?.home ?? undefined,
+    awayTeamId: awayId,
+    awayScore: match.score?.fullTime?.away ?? undefined,
+    venue: match.venue ?? undefined,
+  };
+}
+
+/** One football-data.org matches query, returning `data.matches` (or []
+ * on any failure) — never throws, and always waits out the free tier's
+ * 10-req/min limit before returning, win or lose. */
+async function fetchFootballMatches(url, token) {
+  try {
+    const res = await fetch(url, { headers: { "X-Auth-Token": token } });
+    if (!res.ok) {
+      console.warn(`[fetch-real-events] football-data.org ${url} -> HTTP ${res.status}`);
+      return [];
+    }
+    const data = await res.json();
+    return data.matches ?? [];
+  } catch (err) {
+    console.warn(`[fetch-real-events] football-data.org ${url} failed:`, err.message);
+    return [];
+  } finally {
+    await new Promise((r) => setTimeout(r, 7000));
+  }
+}
+
 async function fetchFootball() {
   const token = process.env.FOOTBALL_DATA_API_TOKEN;
   const teams = new Map();
   const competitions = new Map();
   const events = [];
+  const historyEvents = [];
 
   if (!token) {
     console.warn("[fetch-real-events] FOOTBALL_DATA_API_TOKEN not set — skipping football.");
-    return { teams: [], competitions: [], events: [] };
+    return { teams: [], competitions: [], events: [], historyEvents: [] };
   }
 
   // 30 days back (not just 7) so there's enough finished-match history
-  // per team to compute a "last 5" form line and, when the fixture list
-  // happens to include an earlier meeting, a head-to-head factor —
-  // still exactly one API call per competition, so this costs nothing
-  // extra against the free-tier rate limit.
+  // per team to compute a "last 5" form line even before the deeper,
+  // multi-season history below is factored in.
   const dateFrom = isoDate(new Date(Date.now() - 30 * 86400000));
   const dateTo = isoDate(new Date(Date.now() + 14 * 86400000));
+  const currentSeason = footballCurrentSeasonStartYear();
+  const historyDedupe = new Set();
 
   for (const code of FOOTBALL_COMPETITIONS) {
-    try {
-      const res = await fetch(
-        `https://api.football-data.org/v4/competitions/${code}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`,
-        { headers: { "X-Auth-Token": token } }
+    const nearTermMatches = await fetchFootballMatches(
+      `https://api.football-data.org/v4/competitions/${code}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+      token
+    );
+    for (const match of nearTermMatches) {
+      events.push(mapFootballMatch(match, teams, competitions));
+    }
+
+    // Extra seasons purely for recent-form / head-to-head depth (see
+    // formHistoryRawEvents in main()) — never added to `events`, so an
+    // old season never turns into its own match page on the site.
+    for (let i = 0; i <= FOOTBALL_PAST_SEASONS; i++) {
+      const season = currentSeason - i;
+      const seasonMatches = await fetchFootballMatches(
+        `https://api.football-data.org/v4/competitions/${code}/matches?season=${season}`,
+        token
       );
-      if (!res.ok) {
-        console.warn(`[fetch-real-events] football-data.org ${code} -> HTTP ${res.status}`);
-        continue;
+      for (const match of seasonMatches) {
+        if (match.status !== "FINISHED") continue; // only results are useful as history
+        const event = mapFootballMatch(match, teams, competitions);
+        if (historyDedupe.has(event.id)) continue;
+        historyDedupe.add(event.id);
+        historyEvents.push(event);
       }
-      const data = await res.json();
-
-      for (const match of data.matches ?? []) {
-        const compId = `fd-comp-${match.competition.id}`;
-        if (!competitions.has(compId)) {
-          competitions.set(compId, {
-            id: compId,
-            sport: "football",
-            name: match.competition.name,
-            region: "EU",
-            tier: 1,
-          });
-        }
-
-        const mapTeam = (t) => {
-          const id = `fd-team-${t.id}`;
-          if (!teams.has(id)) {
-            teams.set(id, {
-              id,
-              sport: "football",
-              name: t.name,
-              shortName: t.tla || t.shortName || t.name.slice(0, 3).toUpperCase(),
-              country: undefined,
-            });
-          }
-          return id;
-        };
-
-        const homeId = mapTeam(match.homeTeam);
-        const awayId = mapTeam(match.awayTeam);
-
-        const statusMap = {
-          SCHEDULED: "scheduled",
-          TIMED: "scheduled",
-          IN_PLAY: "scheduled",
-          PAUSED: "scheduled",
-          FINISHED: "finished",
-          POSTPONED: "postponed",
-          SUSPENDED: "cancelled",
-          CANCELLED: "cancelled",
-          AWARDED: "finished",
-        };
-
-        events.push({
-          id: `fd-event-${match.id}`,
-          sport: "football",
-          competitionId: compId,
-          status: statusMap[match.status] ?? "scheduled",
-          startTime: match.utcDate,
-          homeTeamId: homeId,
-          homeScore: match.score?.fullTime?.home ?? undefined,
-          awayTeamId: awayId,
-          awayScore: match.score?.fullTime?.away ?? undefined,
-          venue: match.venue ?? undefined,
-        });
-      }
-      // Free tier is 10 req/min — stay well under it.
-      await new Promise((r) => setTimeout(r, 7000));
-    } catch (err) {
-      console.warn(`[fetch-real-events] football-data.org ${code} failed:`, err.message);
     }
   }
 
-  return { teams: [...teams.values()], competitions: [...competitions.values()], events };
+  return { teams: [...teams.values()], competitions: [...competitions.values()], events, historyEvents };
 }
 
 // ---------------------------------------------------------------------
@@ -210,10 +261,44 @@ function mapNhlGame(game, teams) {
   };
 }
 
-// NHL's schedule endpoint returns one week per call, so — same reasoning
-// as football's 30-day window above — going back this many weeks gets
-// enough finished-game history per team to compute a "last 5" form line.
+// NHL's schedule endpoint returns one week per call — enough windows to
+// discover which teams have near-term fixtures (see fetchHockey below).
 const PAST_WEEK_OFFSETS_DAYS = [-34, -27, -20, -13, -6];
+
+/** One team's full schedule for one NHL season (e.g. "20242025"), via
+ * the club-schedule-season endpoint — a single call gets every game
+ * that team played that season, instead of paging week by week. Games
+ * come back in the same shape as fetchHockeyWeek()'s, so mapNhlGame()
+ * handles both. Returns [] on any failure, same fail-open contract as
+ * the rest of this script. */
+async function fetchNhlTeamSeason(teamAbbrev, season) {
+  try {
+    const res = await fetch(`https://api-web.nhle.com/v1/club-schedule-season/${teamAbbrev}/${season}`);
+    if (!res.ok) {
+      console.warn(`[fetch-real-events] NHL club-schedule-season ${teamAbbrev}/${season} -> HTTP ${res.status}`);
+      return [];
+    }
+    const data = await res.json();
+    return data.games ?? [];
+  } catch (err) {
+    console.warn(`[fetch-real-events] NHL club-schedule-season ${teamAbbrev}/${season} failed:`, err.message);
+    return [];
+  }
+}
+
+function nhlCurrentSeasonStartYear() {
+  const now = new Date();
+  // The NHL regular season starts around October; a "season" is labeled
+  // by its start year, e.g. "20262027" for the season starting Oct 2026.
+  return now.getUTCMonth() >= 6 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
+}
+
+// How many seasons of full per-team schedule to pull as history, on top
+// of the near-term weekly windows above — same reasoning as football's
+// FOOTBALL_PAST_SEASONS: real depth for recent-form/head-to-head, kept
+// modest to stay polite to a free public API with no published rate
+// limit or key requirement.
+const NHL_PAST_SEASONS = 3;
 
 async function fetchHockey() {
   const teams = new Map();
@@ -233,34 +318,38 @@ async function fetchHockey() {
     }
   }
 
-  // Early in a new NHL season (or before it's even started), the windows
-  // above can hold zero *finished* games — nothing to compute recent
-  // form from for any team. Fall back to the same weekly windows exactly
-  // one year earlier (the tail end of the previous season) purely as
-  // extra history for the form/head-to-head math in buildPrediction() /
-  // buildPostMatchInsights() below. Those older games are kept separate
-  // (`historyEvents`) and never merged into `events` — they're not part
-  // of the current schedule and must never get their own match page.
-  let historyEvents = [];
-  const hasFinished = events.some((e) => e.status === "finished");
-  if (!hasFinished) {
-    const lastSeasonWeekStarts = PAST_WEEK_OFFSETS_DAYS.map((d) =>
-      isoDate(new Date(Date.now() + d * 86400000 - 365 * 86400000))
-    );
-    const historyDedupe = new Set();
-    for (const date of lastSeasonWeekStarts) {
-      const games = await fetchHockeyWeek(date);
+  // Deeper per-team history for recent-form/head-to-head context: for
+  // every team that actually has a fixture in the window above, pull
+  // several past seasons of that team's full schedule in one call each
+  // (rather than paging week by week) — reaches back multiple years so
+  // an old head-to-head meeting can still surface, and doesn't depend
+  // on the current season having produced any finished games yet (early
+  // in a new season, or before it's even started, the near-term window
+  // can be all-scheduled with nothing finished). Kept separate
+  // (`historyEvents`) and never merged into `events` — these are not
+  // part of the current schedule and must never get their own match page.
+  const involvedTeamIds = new Set(events.flatMap((e) => [e.homeTeamId, e.awayTeamId]));
+  const currentSeasonStartYear = nhlCurrentSeasonStartYear();
+  const historyEvents = [];
+  const historyDedupe = new Set();
+
+  for (const teamId of involvedTeamIds) {
+    const abbrev = teams.get(teamId)?.shortName;
+    if (!abbrev) continue;
+    for (let i = 0; i <= NHL_PAST_SEASONS; i++) {
+      const startYear = currentSeasonStartYear - i;
+      const season = `${startYear}${startYear + 1}`;
+      const games = await fetchNhlTeamSeason(abbrev, season);
       for (const game of games) {
         const event = mapNhlGame(game, teams);
-        if (event.status !== "finished") continue; // only results are useful as form history
+        if (event.status !== "finished") continue; // only results are useful as history
         if (historyDedupe.has(event.id)) continue;
         historyDedupe.add(event.id);
         historyEvents.push(event);
       }
+      // Be polite to a free, unauthenticated public API.
+      await new Promise((r) => setTimeout(r, 300));
     }
-    console.log(
-      `[fetch-real-events] NHL: no finished games in the current window, pulled ${historyEvents.length} from last season as form history.`
-    );
   }
 
   return {
@@ -279,7 +368,10 @@ async function fetchHockey() {
 /** Newest-first W/D/L for one team from already-fetched raw events,
  * optionally restricted to strictly before `beforeTime` (so a
  * prediction only ever sees matches before kickoff, and a post-match
- * insight only sees matches before that match itself). */
+ * insight only sees matches before that match itself). Used by
+ * buildPostMatchInsights()'s streak counting, which only needs the
+ * result letters; buildPrediction() uses the richer
+ * computeRecentResults() below instead, which also names opponents. */
 function computeForm(rawEvents, teamId, { limit = 5, beforeTime } = {}) {
   return rawEvents
     .filter(
@@ -300,44 +392,166 @@ function computeForm(rawEvents, teamId, { limit = 5, beforeTime } = {}) {
     });
 }
 
+/** Collapses a list of raw events to one entry per id, keeping the
+ * first occurrence. Needed because formHistoryRawEvents can now merge
+ * the near-term events fetch with one or more full-season historical
+ * fetches that overlap it (e.g. a match finished this week can appear
+ * in both), and computeForm()/computeRecentResults()/summarizeH2H()
+ * all assume each real match appears exactly once. */
+function dedupeById(rawEvents) {
+  const seen = new Set();
+  const out = [];
+  for (const e of rawEvents) {
+    if (seen.has(e.id)) continue;
+    seen.add(e.id);
+    out.push(e);
+  }
+  return out;
+}
+
 function formPoints(form) {
   return form.reduce((sum, r) => sum + (r === "W" ? 3 : r === "D" ? 1 : 0), 0);
 }
 
-function computeH2H(rawEvents, teamAId, teamBId, beforeTime) {
-  return rawEvents.filter(
+/** Same filter as computeForm(), but keeps the opponent and scoreline
+ * for each match instead of collapsing it to a single letter — lets the
+ * prediction's "current form" factor name specific opponents and
+ * scores ("won 3-1 against X") instead of a bare points total. */
+function computeRecentResults(rawEvents, teamId, teamsById, { limit = 5, beforeTime } = {}) {
+  return rawEvents
+    .filter(
+      (e) =>
+        e.status === "finished" &&
+        typeof e.homeScore === "number" &&
+        typeof e.awayScore === "number" &&
+        (e.homeTeamId === teamId || e.awayTeamId === teamId) &&
+        (!beforeTime || new Date(e.startTime).getTime() < beforeTime)
+    )
+    .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
+    .slice(0, limit)
+    .map((e) => {
+      const isHome = e.homeTeamId === teamId;
+      const opponentId = isHome ? e.awayTeamId : e.homeTeamId;
+      const scoreFor = isHome ? e.homeScore : e.awayScore;
+      const scoreAgainst = isHome ? e.awayScore : e.homeScore;
+      const result = scoreFor > scoreAgainst ? "W" : scoreFor < scoreAgainst ? "L" : "D";
+      return {
+        result,
+        opponentName: teamsById.get(opponentId)?.name ?? "неизвестный соперник",
+        scoreFor,
+        scoreAgainst,
+      };
+    });
+}
+
+function summarizeRecentResultsRu(teamName, results) {
+  if (results.length === 0) return null;
+  const wins = results.filter((r) => r.result === "W");
+  const losses = results.filter((r) => r.result === "L");
+  const draws = results.filter((r) => r.result === "D");
+
+  let text = `${teamName}: ${wins.length} побед, ${draws.length} ничьих, ${losses.length} поражений в последних ${results.length} матчах`;
+  const highlights = [];
+  if (wins.length > 0) {
+    highlights.push(
+      `победы над ${wins.slice(0, 2).map((r) => `${r.opponentName} (${r.scoreFor}:${r.scoreAgainst})`).join(" и ")}`
+    );
+  }
+  if (losses.length > 0) {
+    highlights.push(
+      `поражения от ${losses.slice(0, 2).map((r) => `${r.opponentName} (${r.scoreFor}:${r.scoreAgainst})`).join(" и ")}`
+    );
+  }
+  if (highlights.length > 0) text += ` — ${highlights.join(", ")}`;
+  return text + ".";
+}
+
+function summarizeRecentResultsEn(teamName, results) {
+  if (results.length === 0) return null;
+  const wins = results.filter((r) => r.result === "W");
+  const losses = results.filter((r) => r.result === "L");
+  const draws = results.filter((r) => r.result === "D");
+
+  let text = `${teamName}: ${wins.length}W ${draws.length}D ${losses.length}L over their last ${results.length} matches`;
+  const highlights = [];
+  if (wins.length > 0) {
+    highlights.push(
+      `wins over ${wins.slice(0, 2).map((r) => `${r.opponentName} (${r.scoreFor}-${r.scoreAgainst})`).join(" and ")}`
+    );
+  }
+  if (losses.length > 0) {
+    highlights.push(
+      `losses to ${losses.slice(0, 2).map((r) => `${r.opponentName} (${r.scoreFor}-${r.scoreAgainst})`).join(" and ")}`
+    );
+  }
+  if (highlights.length > 0) text += ` — ${highlights.join(", ")}`;
+  return text + ".";
+}
+
+/** Aggregate head-to-head tally plus the most recent meeting's exact
+ * scoreline and year — now genuinely deep, since rawEvents can include
+ * several seasons of history per team (see fetchFootball()/fetchHockey()
+ * above), not just whatever happened to fall in a 30-day window. Returns
+ * null when the two teams haven't met within the fetched history. */
+function summarizeH2H(rawEvents, homeId, awayId, beforeTime) {
+  const h2h = rawEvents.filter(
     (e) =>
       e.status === "finished" &&
       typeof e.homeScore === "number" &&
       typeof e.awayScore === "number" &&
-      ((e.homeTeamId === teamAId && e.awayTeamId === teamBId) ||
-        (e.homeTeamId === teamBId && e.awayTeamId === teamAId)) &&
+      ((e.homeTeamId === homeId && e.awayTeamId === awayId) ||
+        (e.homeTeamId === awayId && e.awayTeamId === homeId)) &&
       (!beforeTime || new Date(e.startTime).getTime() < beforeTime)
   );
+  if (h2h.length === 0) return null;
+
+  let homeWins = 0;
+  let awayWins = 0;
+  let draws = 0;
+  for (const m of h2h) {
+    const homeIsHomeNow = m.homeTeamId === homeId;
+    const gf = homeIsHomeNow ? m.homeScore : m.awayScore;
+    const ga = homeIsHomeNow ? m.awayScore : m.homeScore;
+    if (gf > ga) homeWins++;
+    else if (gf < ga) awayWins++;
+    else draws++;
+  }
+
+  const mostRecent = [...h2h].sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())[0];
+  const mostRecentHomeIsHomeNow = mostRecent.homeTeamId === homeId;
+  const lastMeeting = {
+    forHome: mostRecentHomeIsHomeNow ? mostRecent.homeScore : mostRecent.awayScore,
+    forAway: mostRecentHomeIsHomeNow ? mostRecent.awayScore : mostRecent.homeScore,
+    year: new Date(mostRecent.startTime).getUTCFullYear(),
+  };
+
+  return { count: h2h.length, homeWins, awayWins, draws, lastMeeting };
 }
 
 /**
  * A deliberately simple, transparent estimate — recent-form points plus
- * a fixed home-advantage weight, and a head-to-head factor when one is
- * available in the fetched window. Not a statistical/ML model, and
- * never claims to be one (see the predictionDisclaimer copy in
- * messages/*.json). Returns null when there's too little history to
- * say anything ({@link computeForm} finds fewer than 2 matches total
- * between both teams) rather than fabricate a number from nothing.
+ * a fixed home-advantage weight, and a head-to-head factor when the two
+ * teams have met within the fetched history (which, thanks to the
+ * multi-season fetch above, can now reach back several years — not just
+ * whatever happened to fall in the near-term window). Not a statistical
+ * or ML model, and never claims to be one (see the predictionDisclaimer
+ * copy in messages/*.json). Returns null when there's too little
+ * history to say anything (fewer than 2 recent results total between
+ * both teams) rather than fabricate a number from nothing.
  */
-function buildPrediction(event, rawEvents) {
+function buildPrediction(event, rawEvents, teamsById) {
   const kickoff = new Date(event.startTime).getTime();
   const homeId = event.home.team.id;
   const awayId = event.away.team.id;
   const homeName = event.home.team.name;
   const awayName = event.away.team.name;
 
-  const homeForm = computeForm(rawEvents, homeId, { beforeTime: kickoff });
-  const awayForm = computeForm(rawEvents, awayId, { beforeTime: kickoff });
-  if (homeForm.length + awayForm.length < 2) return null;
+  const homeResults = computeRecentResults(rawEvents, homeId, teamsById, { beforeTime: kickoff });
+  const awayResults = computeRecentResults(rawEvents, awayId, teamsById, { beforeTime: kickoff });
+  if (homeResults.length + awayResults.length < 2) return null;
 
-  const homePts = formPoints(homeForm);
-  const awayPts = formPoints(awayForm);
+  const homePts = formPoints(homeResults.map((r) => r.result));
+  const awayPts = formPoints(awayResults.map((r) => r.result));
   const hasDraws = event.sport === "football";
 
   const HOME_ADVANTAGE = 2.2;
@@ -364,14 +578,18 @@ function buildPrediction(event, rawEvents) {
   const factorsRu = [];
   const factorsEn = [];
 
-  if (homeForm.length > 0 || awayForm.length > 0) {
+  if (homeResults.length > 0 || awayResults.length > 0) {
     factorsRu.push({
       label: "Текущая форма",
-      detail: `${homeName} набрали ${homePts} очков в последних ${homeForm.length} матчах, у ${awayName} — ${awayPts} очков в ${awayForm.length} матчах.`,
+      detail: [summarizeRecentResultsRu(homeName, homeResults), summarizeRecentResultsRu(awayName, awayResults)]
+        .filter(Boolean)
+        .join(" "),
     });
     factorsEn.push({
       label: "Current form",
-      detail: `${homeName} picked up ${homePts} points from their last ${homeForm.length} matches, against ${awayPts} for ${awayName} over ${awayForm.length} matches.`,
+      detail: [summarizeRecentResultsEn(homeName, homeResults), summarizeRecentResultsEn(awayName, awayResults)]
+        .filter(Boolean)
+        .join(" "),
     });
   }
 
@@ -384,26 +602,15 @@ function buildPrediction(event, rawEvents) {
     detail: `${homeName} are playing at home — a standard home-advantage weighting is factored in.`,
   });
 
-  const h2h = computeH2H(rawEvents, homeId, awayId, kickoff);
-  if (h2h.length > 0) {
-    let homeWins = 0;
-    let awayWins = 0;
-    let draws = 0;
-    for (const m of h2h) {
-      const homeIsHomeNow = m.homeTeamId === homeId;
-      const gf = homeIsHomeNow ? m.homeScore : m.awayScore;
-      const ga = homeIsHomeNow ? m.awayScore : m.homeScore;
-      if (gf > ga) homeWins++;
-      else if (gf < ga) awayWins++;
-      else draws++;
-    }
+  const h2h = summarizeH2H(rawEvents, homeId, awayId, kickoff);
+  if (h2h) {
     factorsRu.push({
       label: "Личные встречи",
-      detail: `В последних ${h2h.length} очных матчах: ${homeWins} побед ${homeName}, ${draws} ничьих, ${awayWins} побед ${awayName}.`,
+      detail: `В последних ${h2h.count} очных матчах: ${h2h.homeWins} побед ${homeName}, ${h2h.draws} ничьих, ${h2h.awayWins} побед ${awayName}. Последняя встреча (${h2h.lastMeeting.year} г.): ${homeName} ${h2h.lastMeeting.forHome}:${h2h.lastMeeting.forAway} ${awayName}.`,
     });
     factorsEn.push({
       label: "Head-to-head",
-      detail: `In their last ${h2h.length} meetings: ${homeWins} wins for ${homeName}, ${draws} draws, ${awayWins} wins for ${awayName}.`,
+      detail: `In their last ${h2h.count} meetings: ${h2h.homeWins} wins for ${homeName}, ${h2h.draws} draws, ${h2h.awayWins} wins for ${awayName}. Most recent (${h2h.lastMeeting.year}): ${homeName} ${h2h.lastMeeting.forHome}-${h2h.lastMeeting.forAway} ${awayName}.`,
     });
   }
 
@@ -578,10 +785,21 @@ async function main() {
     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
   // Superset used only for form/head-to-head math (see buildPrediction()
-  // and buildPostMatchInsights()) — adds hockey's last-season fallback
-  // history on top of the events actually listed on the site. Never used
-  // to build `events` itself.
-  const formHistoryRawEvents = [...rawEvents, ...(hockey.historyEvents ?? [])];
+  // and buildPostMatchInsights()) — adds several seasons of per-team
+  // history on top of the events actually listed on the site (see
+  // fetchFootball()'s season=YYYY loop and fetchHockey()'s
+  // club-schedule-season loop above), so an old head-to-head meeting can
+  // surface even if it happened years before either team's next fixture.
+  // Never used to build `events` itself. Deduped by id: a currently
+  // finished match can legitimately appear both in the near-term
+  // `events` fetch and in a `season=currentSeason` / current-season
+  // history fetch, and counting it twice would double its weight in
+  // recent-form/head-to-head math.
+  const formHistoryRawEvents = dedupeById([
+    ...rawEvents,
+    ...(football.historyEvents ?? []),
+    ...(hockey.historyEvents ?? []),
+  ]);
 
   // Predictions (scheduled events) and post-match insights (finished
   // events), computed from the matches already fetched above — see the
@@ -595,7 +813,7 @@ async function main() {
 
   for (const event of events) {
     if (event.status === "scheduled") {
-      const prediction = buildPrediction(event, formHistoryRawEvents);
+      const prediction = buildPrediction(event, formHistoryRawEvents, teamsById);
       if (prediction) {
         predictionsRu.push(prediction.ru);
         predictionsEn.push(prediction.en);
